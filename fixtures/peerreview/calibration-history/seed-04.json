@@ -1,0 +1,12 @@
+{
+  "record_id": "seed-04",
+  "assignment_id": "cs201-a3-bfs",
+  "workspace_version": "v1",
+  "approved_at": "2026-05-29T15:20:00Z",
+  "student_alias": "submission-0183",
+  "scores": { "correctness": 3, "algorithmic_understanding": 1, "edge_cases": 1, "code_quality": 0 },
+  "total": 5,
+  "misconception_labels": ["dfs_instead_of_bfs"],
+  "ta_notes": "Depth-first again — finds a path but not the shortest. Also left debug prints in. Docked correctness, algorithmic understanding, and code quality.",
+  "feedback_style": "detailed"
+}

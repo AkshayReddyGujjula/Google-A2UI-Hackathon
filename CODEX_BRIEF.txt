@@ -1,0 +1,407 @@
+# PeerReview.ai — Context + Mission for Codex
+
+You are taking over an in-progress hackathon project on this same Windows machine.
+Read this entire brief before doing anything. Then execute the mission at the bottom,
+iterating until the app is genuinely demo-ready for a live, real-time TA demo.
+
+═══════════════════════════════════════════════════════════════════════
+PART 1 — CONTEXT (get yourself fully caught up)
+═══════════════════════════════════════════════════════════════════════
+
+## The hackathon
+This is the **Generative UI Hackathon Track** (CopilotKit + AG-UI). The submission
+MUST visibly use: **CopilotKit + AG-UI** (live agent↔frontend loop), **A2UI**
+(declarative generative UI surfaces), and **LinkUp** (source-grounded search).
+Redis is optional. Judging: most creative use of Generative UI + A2UI; integration
+of the three; technical difficulty; originality. Deliverables: public GitHub repo,
+demo video, social post.
+
+## The product — PeerReview.ai
+An agentic, evidence-based **marking cockpit** for CS-assignment grading by TAs.
+The UI is not a wrapper around the AI — the UI IS the product: the agent *generates*
+the marking interface at runtime from the assignment, the repo, the real test results,
+and the misconception detected, with a human approving every final mark.
+
+Two phases, two LangGraph agents:
+- **Phase 1 — Setup (`/setup`)**: understand assignment → LinkUp reference →
+  generate tests → **validate them against a trusted reference solution** (only
+  reference-passing tests may freeze) → **human approval gate** → freeze workspace.
+- **Phase 2 — Review (`/review`)**: ingest submission (uploaded folder / public
+  GitHub URL / seeded) → **run the frozen pytest suite FOR REAL** (subprocess +
+  timeout) → detect misconception → **deterministic graph trace** (run reference
+  BFS layers vs the student's actual returned path) → propose evidence-based scores →
+  calibration memory → **human approval gate** (edit a score → feedback regenerates) →
+  final feedback saved to a local archive.
+
+## Architecture (adapted from CopilotKit's generative-ui-london-hackathon-starter)
+- **Frontend** (`src/`): Next.js + CopilotKit. Pages `src/app/(pdf)/setup/page.tsx`
+  and `.../review/page.tsx` (routes are `/setup`, `/review`; the `(pdf)` folder name
+  is inherited — fine to rename if careful). Chat (left) + `SurfaceCanvas` (right).
+  Runtime route `src/app/api/copilotkit-agents/route.ts` proxies to the agents on
+  `:8123`. A2UI catalog: `src/a2ui/catalog/{definitions.ts, renderers.tsx}`.
+- **Backend** (`agent/`): FastAPI + LangGraph on `:8123`, `main.py` registers
+  `/setup` and `/review`. Domain logic in `agent/src/peerreview/`:
+  `pipeline.py` (orchestration), `test_runner.py` (REAL pytest + graph trace),
+  `analysis.py` (misconception detection + scoring + feedback),
+  `linkup.py` (reference lookup + offline fallback), `ingest.py` (seeded/pasted/GitHub),
+  `store.py` (local JSON: workspaces/calibration/feedback), `surfaces.py` (deterministic
+  A2UI builders), `offline.py` (OFFLINE stub). Agents: `setup_agent.py`, `review_agent.py`.
+  Model: Gemini via `langchain-google-genai`, default id `gemini-3.5-flash`.
+- **A2UI catalog**: generic primitives (Stack/Card/Section/Badge/Callout/DataTable/
+  Button/charts) reused heavily, plus custom panels: `VisualGraphTracePanel` (SVG —
+  BFS layers vs student path), `GradeApprovalPanel` (interactive editable scores +
+  approve), `TestResultsPanel`, `MisconceptionPanel`, `ReferenceContextPanel`, `CodeBlock`.
+- **Fixtures**: `fixtures/peerreview/assignment-bfs/` (brief.md, rubric.json,
+  reference_solution.py, tests_reference.py), `submission-dfs/`, `submission-bfs-correct/`,
+  `calibration-history/` (5 seeded records).
+
+## Key design decisions and WHY (do not regress these)
+1. **Deterministic core, LLM only for prose.** Marks-bearing decisions (pass/fail,
+   misconception label, proposed scores, graph trace) are deterministic and derived
+   from REAL evidence. Gemini only orchestrates (which tool to call) and polishes
+   prose (misconception explanation, feedback letter). This is what makes the grades
+   trustworthy. Don't let "simplification" move scoring into the LLM.
+2. **Generated tests are validated against a trusted reference solution** before they
+   can be frozen — answers "how do you know the tests are correct?"
+3. **Graph-search tests assert PATH PROPERTIES, not one exact path** (multiple shortest
+   paths are valid). The DFS submission fails ONLY the minimal-length property test —
+   that's the misconception signal.
+4. **Honest sandbox scope.** The runner is subprocess + hard timeout + captured output,
+   for CONTROLLED demo submissions only. Docker isolation is the documented hardening
+   path. Do NOT claim a "secure sandbox."
+5. **Reuse A2UI primitives; add few custom panels.** The agent composes surfaces from a
+   trusted catalog via deterministic Python builders — reliable, handles variable-length
+   data, no invalid-JSON risk.
+6. **Human-in-the-loop via A2UI button actions.** Buttons dispatch named events
+   (`approve_workspace`, `approve_grades`, …) → `SurfaceCanvas.onAction` → `agent.runAgent`
+   → backend injects `log_a2ui_event`. No LangGraph interrupts needed.
+
+## Current status (what's done + verified)
+The full flow was verified end-to-end in a browser in **OFFLINE mode** (no keys):
+setup → approve/freeze → review (DFS submission) → edit a score → approve → final
+feedback saved. Real pytest ran (6/7 pass, minimal-length fails with the real
+assertion), the DFS-vs-BFS misconception fired, and the SVG graph trace rendered
+(green A→F→G vs orange-dashed A→B→C→D→E→G). `tsc --noEmit` is clean.
+
+## Environment + how to run (THIS machine — important gotchas)
+- pnpm installed via `npm i -g pnpm`; `uv` installed via `pip install uv` but NOT on
+  PATH (use `python -m uv` or `~/AppData/Roaming/Python/Python314/Scripts/uv.exe`).
+- Agent venv at `agent/.venv` (Python 3.12). If you must recreate it and `uv sync`
+  errors on Python version, pin: `uv sync --python 3.12` or point at the concrete
+  `...\uv\python\cpython-3.12.13-...\python.exe`.
+- Run: `pnpm dev` (concurrently Next on :3000 + agent on :8123 via
+  `scripts/run-agent.mjs`, which launches `agent/.venv` uvicorn directly — no uv at
+  runtime). `.npmrc` has `verify-deps-before-run=false`; `pnpm-workspace.yaml`
+  `allowBuilds` has esbuild/sharp=true. postinstall is a no-op.
+- **CRITICAL uvicorn-restart gotcha**: `uvicorn --reload` runs a reloader PARENT +
+  server CHILD. Killing only one orphans the other, which keeps serving STALE code on
+  :8123 and makes new starts fail silently. If code edits don't show up in the browser
+  even though disk is correct: `Get-Process python | Stop-Process -Force`, confirm
+  `:8123` is free, then start exactly one agent. Verify the agent log shows
+  "Uvicorn running on http://127.0.0.1:8123 ... Application startup complete".
+- `.env` currently has `OFFLINE=1` and now a real `GEMINI_API_KEY` (the user added it).
+  LinkUp key is NOT set (its panel falls back to a clearly-labelled bundled reference —
+  that's expected; ignore LinkUp for now).
+- Read `walkthrough.txt` and `README.md` in the repo root for the full narrative.
+
+## Known minor issues to address
+- First "Load/submit" click immediately after a hard page reload no-ops until CopilotKit
+  connects (the send() guards on `agent` being ready). Harden this (disable controls
+  until ready, or queue the action).
+- The **live Gemini path has NOT been tested yet** (only OFFLINE). In particular,
+  confirm `gemini-3.5-flash` is a valid model id for the user's AI Studio key; if not,
+  set `MODEL` in `.env` to a model the key supports (e.g. a current `gemini-*-flash`)
+  and confirm tool-calling + multi-turn work.
+
+═══════════════════════════════════════════════════════════════════════
+PART 2 — YOUR MISSION
+═══════════════════════════════════════════════════════════════════════
+
+GOAL: Make PeerReview.ai a polished, clear, genuinely usable product that an ACTUAL TA
+could use in a beta test to provisionally mark real student code — live and in real time —
+and that is worthy of an on-stage demo and a recorded demo video. Treat this as a goal to
+iterate toward: repeatedly USE the app yourself as if you were a TA, find friction and
+bugs, fix them, and re-test, until it is demo-ready.
+
+Switch the app to LIVE mode: set `OFFLINE=` (empty) or remove it in `.env` so the real
+Gemini path runs. Keep LinkUp on its graceful fallback (no key).
+
+Do the following. Think hard and add anything else you judge necessary.
+
+1) RUN IT LIVE AND TEST FULLY, LIKE A REAL TA — not localized, no canned shortcuts.
+   - Start the servers (heed the uvicorn-restart gotcha). Open the browser and drive the
+     real UI. Verify the WHOLE journey with LIVE Gemini, end to end, multiple times:
+     Setup → approve & freeze → Review → analysis → edit a score → approve → final feedback.
+   - The hero path for the demo is a TA doing real work: **uploading a folder of student
+     code** and **pasting a public GitHub repo URL** — verify BOTH work live, not just the
+     seeded button. The seeded button is a fallback, not the demo crutch.
+   - Verify the agent actually reasons live: the misconception explanation and the feedback
+     letter should be Gemini-written prose grounded in the real test results, while scores
+     and pass/fail stay deterministic. Confirm nothing crashes across turns (Gemini
+     tool-calling / multi-turn).
+   - Use the browser DevTools/console; fix any runtime errors or warnings you can.
+
+2) CREATE REAL STUDENT-CODE EXAMPLES for live demo use (if not already present/sufficient).
+   - Add a clearly-named top-level folder (e.g. `demo-submissions/`) containing SEVERAL
+     realistic student submissions the TA can upload during a live demo or video — each in
+     its own subfolder with a believable `solution.py` (and maybe extra files), e.g.:
+       * a correct BFS (full marks)
+       * the DFS-instead-of-BFS bug (the headline misconception)
+       * a solution that crashes on the unreachable case (missing `None`)
+       * one that infinite-loops on a cycle (no visited set → hits the runner timeout)
+       * an off-by-one / returns path excluding an endpoint
+     These must be plausible real student code, not toy stubs. Document them in a short
+     README in that folder. (Do NOT remove the existing `fixtures/` — those drive the
+     seeded path and tests.)
+   - Optional, if time: a second assignment type to show the workspace adapts (keep BFS
+     as the primary demo).
+
+3) CLEAN UP THE CODEBASE FOR SUBMISSION — CAREFULLY.
+   - Remove redundant/unused files inherited from the starter that are NOT part of
+     PeerReview.ai (candidates to evaluate, do not blindly delete: `other-examples/`,
+     `a2a/`, the legal route `src/app/api/copilotkit/[[...slug]]`, PDF-analyst leftovers
+     like `src/lib/pdf.ts` and unused components, starter docs that describe the old PDF
+     demo such as `FROZEN.md`/`HACKATHON.md`/`WELCOME.md`/`SUBMITTING.md`/`AGENTS.md` if
+     irrelevant, Dockerfiles/compose if unused, `data/projectops.json`).
+   - BE VERY CAREFUL: before deleting anything, confirm nothing imports it. After EACH
+     removal run `pnpm typecheck` (or `node_modules/.bin/tsc --noEmit`) and re-run the app
+     in the browser to confirm nothing broke. Do NOT delete any actual implementation,
+     fixtures, agent modules, catalog, pages, or config the app depends on. If unsure,
+     keep it. Prefer a small number of confident removals over aggressive deletion.
+
+4) MAKE IT TA-READY (clarity + usability for someone who has never seen it).
+   - The two phases and what to do should be obvious. Strong empty states, clear button
+     labels, loading indicators while the agent works, and graceful error messages (bad
+     GitHub URL, submission missing the required function, agent/key errors, timeouts).
+   - Fix the first-click-after-load no-op (disable controls until the agent is connected,
+     or queue the action and show a "connecting…" state).
+   - Make sure a TA can tell, at a glance: what the proposed mark is, why (evidence), what
+     the misconception is, and that THEY are the one approving. Tighten copy and layout.
+   - Hide/disable the CopilotKit dev console for the demo (already `showDevConsole={false}`
+     — verify). Remove any leftover "pdf"/CopilotKit-starter branding from the user-facing UI.
+   - Ensure the README run instructions actually work from a clean state on this machine.
+
+5) ANYTHING ELSE you judge necessary for a credible beta + demo: sensible defaults, no
+   console errors, no dead nav links, accessible contrast, mobile-reasonable layout,
+   and a quick once-over of the `/catalog` page if it's kept.
+
+WORKING STYLE (iterate to a polished result):
+- Treat "use the app like a real TA in the browser, live" as your acceptance test. After
+  every meaningful change, actually run the journey again and observe the result before
+  moving on. Don't declare done from code-reading alone.
+- Keep the design invariants from Part 1 (deterministic marks, test validation, path-
+  property tests, HITL gates, honest sandbox). Don't regress them while cleaning up.
+- Loop: test as a TA → list the friction/bugs → fix → re-test. Repeat until the full
+  live flow (folder upload AND GitHub URL) is smooth, clear, error-resilient, and you'd
+  be comfortable recording a demo video of it unscripted.
+- When you believe it's demo-ready, write a short `DEMO.md` with the exact live walkthrough
+  a TA would follow on stage (which example to upload, what to point at, the approve steps),
+  and update `walkthrough.txt`/`README.md` to reflect any changes you made.
+
+Do not commit unless asked; leave the working tree clean and the app runnable via `pnpm dev`.
+
+
+
+
+
+# PeerReview.ai — Context + Mission for Codex
+
+You are taking over an in-progress hackathon project on this same Windows machine.
+Read this entire brief before doing anything. Then execute the mission at the bottom,
+iterating until the app is genuinely demo-ready for a live, real-time TA demo.
+
+═══════════════════════════════════════════════════════════════════════
+PART 1 — CONTEXT (get yourself fully caught up)
+═══════════════════════════════════════════════════════════════════════
+
+## The hackathon
+This is the **Generative UI Hackathon Track** (CopilotKit + AG-UI). The submission
+MUST visibly use: **CopilotKit + AG-UI** (live agent↔frontend loop), **A2UI**
+(declarative generative UI surfaces), and **LinkUp** (source-grounded search).
+Redis is optional. Judging: most creative use of Generative UI + A2UI; integration
+of the three; technical difficulty; originality. Deliverables: public GitHub repo,
+demo video, social post.
+
+## The product — PeerReview.ai
+An agentic, evidence-based **marking cockpit** for CS-assignment grading by TAs.
+The UI is not a wrapper around the AI — the UI IS the product: the agent *generates*
+the marking interface at runtime from the assignment, the repo, the real test results,
+and the misconception detected, with a human approving every final mark.
+
+Two phases, two LangGraph agents:
+- **Phase 1 — Setup (`/setup`)**: understand assignment → LinkUp reference →
+  generate tests → **validate them against a trusted reference solution** (only
+  reference-passing tests may freeze) → **human approval gate** → freeze workspace.
+- **Phase 2 — Review (`/review`)**: ingest submission (uploaded folder / public
+  GitHub URL / seeded) → **run the frozen pytest suite FOR REAL** (subprocess +
+  timeout) → detect misconception → **deterministic graph trace** (run reference
+  BFS layers vs the student's actual returned path) → propose evidence-based scores →
+  calibration memory → **human approval gate** (edit a score → feedback regenerates) →
+  final feedback saved to a local archive.
+
+## Architecture (adapted from CopilotKit's generative-ui-london-hackathon-starter)
+- **Frontend** (`src/`): Next.js + CopilotKit. Pages `src/app/(pdf)/setup/page.tsx`
+  and `.../review/page.tsx` (routes are `/setup`, `/review`; the `(pdf)` folder name
+  is inherited — fine to rename if careful). Chat (left) + `SurfaceCanvas` (right).
+  Runtime route `src/app/api/copilotkit-agents/route.ts` proxies to the agents on
+  `:8123`. A2UI catalog: `src/a2ui/catalog/{definitions.ts, renderers.tsx}`.
+- **Backend** (`agent/`): FastAPI + LangGraph on `:8123`, `main.py` registers
+  `/setup` and `/review`. Domain logic in `agent/src/peerreview/`:
+  `pipeline.py` (orchestration), `test_runner.py` (REAL pytest + graph trace),
+  `analysis.py` (misconception detection + scoring + feedback),
+  `linkup.py` (reference lookup + offline fallback), `ingest.py` (seeded/pasted/GitHub),
+  `store.py` (local JSON: workspaces/calibration/feedback), `surfaces.py` (deterministic
+  A2UI builders), `offline.py` (OFFLINE stub). Agents: `setup_agent.py`, `review_agent.py`.
+  Model: Gemini via `langchain-google-genai`, default id `gemini-3.5-flash`.
+- **A2UI catalog**: generic primitives (Stack/Card/Section/Badge/Callout/DataTable/
+  Button/charts) reused heavily, plus custom panels: `VisualGraphTracePanel` (SVG —
+  BFS layers vs student path), `GradeApprovalPanel` (interactive editable scores +
+  approve), `TestResultsPanel`, `MisconceptionPanel`, `ReferenceContextPanel`, `CodeBlock`.
+- **Fixtures**: `fixtures/peerreview/assignment-bfs/` (brief.md, rubric.json,
+  reference_solution.py, tests_reference.py), `submission-dfs/`, `submission-bfs-correct/`,
+  `calibration-history/` (5 seeded records).
+
+## Key design decisions and WHY (do not regress these)
+1. **Deterministic core, LLM only for prose.** Marks-bearing decisions (pass/fail,
+   misconception label, proposed scores, graph trace) are deterministic and derived
+   from REAL evidence. Gemini only orchestrates (which tool to call) and polishes
+   prose (misconception explanation, feedback letter). This is what makes the grades
+   trustworthy. Don't let "simplification" move scoring into the LLM.
+2. **Generated tests are validated against a trusted reference solution** before they
+   can be frozen — answers "how do you know the tests are correct?"
+3. **Graph-search tests assert PATH PROPERTIES, not one exact path** (multiple shortest
+   paths are valid). The DFS submission fails ONLY the minimal-length property test —
+   that's the misconception signal.
+4. **Honest sandbox scope.** The runner is subprocess + hard timeout + captured output,
+   for CONTROLLED demo submissions only. Docker isolation is the documented hardening
+   path. Do NOT claim a "secure sandbox."
+5. **Reuse A2UI primitives; add few custom panels.** The agent composes surfaces from a
+   trusted catalog via deterministic Python builders — reliable, handles variable-length
+   data, no invalid-JSON risk.
+6. **Human-in-the-loop via A2UI button actions.** Buttons dispatch named events
+   (`approve_workspace`, `approve_grades`, …) → `SurfaceCanvas.onAction` → `agent.runAgent`
+   → backend injects `log_a2ui_event`. No LangGraph interrupts needed.
+
+## Current status (what's done + verified)
+The full flow was verified end-to-end in a browser in **OFFLINE mode** (no keys):
+setup → approve/freeze → review (DFS submission) → edit a score → approve → final
+feedback saved. Real pytest ran (6/7 pass, minimal-length fails with the real
+assertion), the DFS-vs-BFS misconception fired, and the SVG graph trace rendered
+(green A→F→G vs orange-dashed A→B→C→D→E→G). `tsc --noEmit` is clean.
+
+## Environment + how to run (THIS machine — important gotchas)
+- pnpm installed via `npm i -g pnpm`; `uv` installed via `pip install uv` but NOT on
+  PATH (use `python -m uv` or `~/AppData/Roaming/Python/Python314/Scripts/uv.exe`).
+- Agent venv at `agent/.venv` (Python 3.12). If you must recreate it and `uv sync`
+  errors on Python version, pin: `uv sync --python 3.12` or point at the concrete
+  `...\uv\python\cpython-3.12.13-...\python.exe`.
+- Run: `pnpm dev` (concurrently Next on :3000 + agent on :8123 via
+  `scripts/run-agent.mjs`, which launches `agent/.venv` uvicorn directly — no uv at
+  runtime). `.npmrc` has `verify-deps-before-run=false`; `pnpm-workspace.yaml`
+  `allowBuilds` has esbuild/sharp=true. postinstall is a no-op.
+- **CRITICAL uvicorn-restart gotcha**: `uvicorn --reload` runs a reloader PARENT +
+  server CHILD. Killing only one orphans the other, which keeps serving STALE code on
+  :8123 and makes new starts fail silently. If code edits don't show up in the browser
+  even though disk is correct: `Get-Process python | Stop-Process -Force`, confirm
+  `:8123` is free, then start exactly one agent. Verify the agent log shows
+  "Uvicorn running on http://127.0.0.1:8123 ... Application startup complete".
+- `.env` currently has `OFFLINE=1` and now a real `GEMINI_API_KEY` (the user added it).
+  LinkUp key is NOT set (its panel falls back to a clearly-labelled bundled reference —
+  that's expected; ignore LinkUp for now).
+- Read `walkthrough.txt` and `README.md` in the repo root for the full narrative.
+
+## Known minor issues to address
+- First "Load/submit" click immediately after a hard page reload no-ops until CopilotKit
+  connects (the send() guards on `agent` being ready). Harden this (disable controls
+  until ready, or queue the action).
+- The **live Gemini path has NOT been tested yet** (only OFFLINE). In particular,
+  confirm `gemini-3.5-flash` is a valid model id for the user's AI Studio key; if not,
+  set `MODEL` in `.env` to a model the key supports (e.g. a current `gemini-*-flash`)
+  and confirm tool-calling + multi-turn work.
+
+═══════════════════════════════════════════════════════════════════════
+PART 2 — YOUR MISSION
+═══════════════════════════════════════════════════════════════════════
+
+GOAL: Make PeerReview.ai a polished, clear, genuinely usable product that an ACTUAL TA
+could use in a beta test to provisionally mark real student code — live and in real time —
+and that is worthy of an on-stage demo and a recorded demo video. Treat this as a goal to
+iterate toward: repeatedly USE the app yourself as if you were a TA, find friction and
+bugs, fix them, and re-test, until it is demo-ready.
+
+Switch the app to LIVE mode: set `OFFLINE=` (empty) or remove it in `.env` so the real
+Gemini path runs. Keep LinkUp on its graceful fallback (no key).
+
+Do the following. Think hard and add anything else you judge necessary.
+
+1) RUN IT LIVE AND TEST FULLY, LIKE A REAL TA — not localized, no canned shortcuts.
+   - Start the servers (heed the uvicorn-restart gotcha). Open the browser and drive the
+     real UI. Verify the WHOLE journey with LIVE Gemini, end to end, multiple times:
+     Setup → approve & freeze → Review → analysis → edit a score → approve → final feedback.
+   - The hero path for the demo is a TA doing real work: **uploading a folder of student
+     code** and **pasting a public GitHub repo URL** — verify BOTH work live, not just the
+     seeded button. The seeded button is a fallback, not the demo crutch.
+   - Verify the agent actually reasons live: the misconception explanation and the feedback
+     letter should be Gemini-written prose grounded in the real test results, while scores
+     and pass/fail stay deterministic. Confirm nothing crashes across turns (Gemini
+     tool-calling / multi-turn).
+   - Use the browser DevTools/console; fix any runtime errors or warnings you can.
+
+2) CREATE REAL STUDENT-CODE EXAMPLES for live demo use (if not already present/sufficient).
+   - Add a clearly-named top-level folder (e.g. `demo-submissions/`) containing SEVERAL
+     realistic student submissions the TA can upload during a live demo or video — each in
+     its own subfolder with a believable `solution.py` (and maybe extra files), e.g.:
+       * a correct BFS (full marks)
+       * the DFS-instead-of-BFS bug (the headline misconception)
+       * a solution that crashes on the unreachable case (missing `None`)
+       * one that infinite-loops on a cycle (no visited set → hits the runner timeout)
+       * an off-by-one / returns path excluding an endpoint
+     These must be plausible real student code, not toy stubs. Document them in a short
+     README in that folder. (Do NOT remove the existing `fixtures/` — those drive the
+     seeded path and tests.)
+   - Optional, if time: a second assignment type to show the workspace adapts (keep BFS
+     as the primary demo).
+
+3) CLEAN UP THE CODEBASE FOR SUBMISSION — CAREFULLY.
+   - Remove redundant/unused files inherited from the starter that are NOT part of
+     PeerReview.ai (candidates to evaluate, do not blindly delete: `other-examples/`,
+     `a2a/`, the legal route `src/app/api/copilotkit/[[...slug]]`, PDF-analyst leftovers
+     like `src/lib/pdf.ts` and unused components, starter docs that describe the old PDF
+     demo such as `FROZEN.md`/`HACKATHON.md`/`WELCOME.md`/`SUBMITTING.md`/`AGENTS.md` if
+     irrelevant, Dockerfiles/compose if unused, `data/projectops.json`).
+   - BE VERY CAREFUL: before deleting anything, confirm nothing imports it. After EACH
+     removal run `pnpm typecheck` (or `node_modules/.bin/tsc --noEmit`) and re-run the app
+     in the browser to confirm nothing broke. Do NOT delete any actual implementation,
+     fixtures, agent modules, catalog, pages, or config the app depends on. If unsure,
+     keep it. Prefer a small number of confident removals over aggressive deletion.
+
+4) MAKE IT TA-READY (clarity + usability for someone who has never seen it).
+   - The two phases and what to do should be obvious. Strong empty states, clear button
+     labels, loading indicators while the agent works, and graceful error messages (bad
+     GitHub URL, submission missing the required function, agent/key errors, timeouts).
+   - Fix the first-click-after-load no-op (disable controls until the agent is connected,
+     or queue the action and show a "connecting…" state).
+   - Make sure a TA can tell, at a glance: what the proposed mark is, why (evidence), what
+     the misconception is, and that THEY are the one approving. Tighten copy and layout.
+   - Hide/disable the CopilotKit dev console for the demo (already `showDevConsole={false}`
+     — verify). Remove any leftover "pdf"/CopilotKit-starter branding from the user-facing UI.
+   - Ensure the README run instructions actually work from a clean state on this machine.
+
+5) ANYTHING ELSE you judge necessary for a credible beta + demo: sensible defaults, no
+   console errors, no dead nav links, accessible contrast, mobile-reasonable layout,
+   and a quick once-over of the `/catalog` page if it's kept.
+
+WORKING STYLE (iterate to a polished result):
+- Treat "use the app like a real TA in the browser, live" as your acceptance test. After
+  every meaningful change, actually run the journey again and observe the result before
+  moving on. Don't declare done from code-reading alone.
+- Keep the design invariants from Part 1 (deterministic marks, test validation, path-
+  property tests, HITL gates, honest sandbox). Don't regress them while cleaning up.
+- Loop: test as a TA → list the friction/bugs → fix → re-test. Repeat until the full
+  live flow (folder upload AND GitHub URL) is smooth, clear, error-resilient, and you'd
+  be comfortable recording a demo video of it unscripted.
+- When you believe it's demo-ready, write a short `DEMO.md` with the exact live walkthrough
+  a TA would follow on stage (which example to upload, what to point at, the approve steps),
+  and update `walkthrough.txt`/`README.md` to reflect any changes you made.
+
+Do not commit unless asked, work on main; leave the working tree clean and the app runnable via `pnpm dev`.

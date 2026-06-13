@@ -1,0 +1,12 @@
+{
+  "record_id": "seed-03",
+  "assignment_id": "cs201-a3-bfs",
+  "workspace_version": "v1",
+  "approved_at": "2026-05-29T09:41:00Z",
+  "student_alias": "submission-0207",
+  "scores": { "correctness": 5, "algorithmic_understanding": 3, "edge_cases": 0, "code_quality": 1 },
+  "total": 9,
+  "misconception_labels": ["missing_unreachable_case"],
+  "ta_notes": "Correct BFS with queue + visited, but crashes instead of returning None when the goal is unreachable. Lost the edge-case mark only.",
+  "feedback_style": "concise"
+}

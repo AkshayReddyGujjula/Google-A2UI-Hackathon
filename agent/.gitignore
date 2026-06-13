@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.vercel
+
+# python
+.venv/
+.langgraph_api/
+
+# PeerReview.ai runtime artifacts (frozen workspaces, feedback, calibration)
+data/peerreview/

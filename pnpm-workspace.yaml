@@ -1,0 +1,5 @@
+allowBuilds:
+  '@scarf/scarf': false
+  esbuild: true
+  lefthook: false
+  sharp: true

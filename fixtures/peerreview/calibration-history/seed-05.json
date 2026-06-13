@@ -1,0 +1,12 @@
+{
+  "record_id": "seed-05",
+  "assignment_id": "cs201-a3-bfs",
+  "workspace_version": "v1",
+  "approved_at": "2026-05-30T08:55:00Z",
+  "student_alias": "submission-0231",
+  "scores": { "correctness": 5, "algorithmic_understanding": 3, "edge_cases": 1, "code_quality": 1 },
+  "total": 10,
+  "misconception_labels": [],
+  "ta_notes": "Clean iterative BFS, handles all edge cases. Full marks.",
+  "feedback_style": "concise"
+}

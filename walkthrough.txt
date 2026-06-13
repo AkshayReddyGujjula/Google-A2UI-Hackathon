@@ -1,0 +1,338 @@
+================================================================================
+PeerReview.ai — IMPLEMENTATION WALKTHROUGH
+A stage-by-stage account of what was built and WHY.
+================================================================================
+
+This file walks you through the MVP exactly as it was built, with the reasoning
+behind each decision. Read it top to bottom and you'll understand the whole
+system and be able to explain/defend any part of it to a judge.
+
+
+--------------------------------------------------------------------------------
+0. THE BRIEF, AND WHAT I CHANGED ABOUT THE PLAN
+--------------------------------------------------------------------------------
+
+The hackathon track (Generative UI) requires the submission to VISIBLY use:
+  - CopilotKit + AG-UI   (live agent <-> frontend loop)
+  - A2UI                 (declarative generative UI surfaces)
+  - LinkUp               (source-grounded web search)
+Redis is optional. Judging: creative use of Generative UI + A2UI, integration of
+the three, technical difficulty, originality.
+
+Your initial plan ("PeerReview AI agent for TAs") was architecturally sound but
+MASSIVELY over-scoped: ~25 agent nodes and ~30 A2UI components across 3 surfaces.
+At hackathon time-scales that means nothing works end-to-end. So I collapsed it
+to a focused vertical slice (~6 agent nodes, ~10 surfaces) that still tells the
+ENTIRE demo story — a BFS-vs-DFS graph-search assignment — and put the saved
+engineering effort into the parts that win "technical difficulty" points:
+real test execution and a deterministic graph-trace visualisation.
+
+Four decisions you made that shaped everything:
+  1. Base the build on the official starter repo (adapt, don't rebuild).
+  2. You fill the API keys in .env yourself (none are committed).
+  3. REALLY execute student code (not LLM-judged) — so I built a real pytest
+     runner.
+  4. Support folder upload AND a public GitHub URL, plus a seeded sample.
+
+Then you added five excellent correctness refinements, all of which are in:
+  (a) Generated tests must be VALIDATED against a trusted reference solution
+      before they can be frozen.
+  (b) Graph-search tests assert PATH PROPERTIES, not one exact path (multiple
+      shortest paths can be valid).
+  (c) Honest sandbox scope — subprocess+timeout for controlled demos; Docker is
+      the documented hardening path. No over-claiming "secure sandbox".
+  (d) Calibration needs SEEDED history so the self-improvement loop is visible
+      on the first run.
+  (e) LinkUp is visible but NOT central — explanation-only, never affects score.
+
+
+--------------------------------------------------------------------------------
+1. WHY ADAPT THE STARTER (and the architecture it gave us)
+--------------------------------------------------------------------------------
+
+The starter (jerelvelarde/generative-ui-london-hackathon-starter) already wires
+the HARD part correctly: a Next.js frontend + a Python FastAPI/LangGraph agent,
+connected by CopilotKit + AG-UI, rendering A2UI surfaces, on Gemini. Rebuilding
+that plumbing from scratch is exactly the kind of thing that eats a whole
+hackathon. So I cloned it into the project (keeping our git history) and changed
+the DOMAIN — the agent nodes, the A2UI catalog, the pages — not the transport.
+
+Key patterns I learned from it and reused:
+  - Backend agents are LangGraph graphs built with langchain `create_agent(...)`,
+    given tools + a CopilotKitMiddleware + a MemorySaver checkpointer.
+  - A tool emits a surface by returning
+        a2ui.render(operations=[create_surface, update_components, update_data_model])
+    The AG-UI transport carries that to the browser; CopilotKit's a2ui middleware
+    turns it into a rendered surface.
+  - The frontend catalog lives in THREE synced places:
+        src/a2ui/catalog/definitions.ts   (Zod prop schemas)
+        src/a2ui/catalog/renderers.tsx    (React renderers; a `renderers` map)
+        agent/src/catalog.py              (CATALOG_ID + a prompt summary)
+    CATALOG_ID must match across sides so the runtime resolves to our renderers.
+  - The page is a split: <CopilotChat> on the left, a <SurfaceCanvas> on the
+    right. A MirrorRenderer catches the surface from the chat stream and
+    forwards it to the canvas (leaving a "surface -> rendered" pill in chat).
+  - HUMAN-IN-THE-LOOP (the bit that makes this a marking *workspace*, not a
+    chatbot): SurfaceCanvas's A2UIProvider has an onAction() callback. When you
+    click a button in a rendered surface, it adds a chat message AND calls
+    agent.runAgent({forwardedProps:{a2uiAction}}). The backend middleware injects
+    a `log_a2ui_event` tool result so the agent reacts on its next turn. THIS is
+    how "Approve & Freeze" and "Approve grades" work — no LangGraph interrupts
+    needed, just buttons that dispatch named events.
+
+
+--------------------------------------------------------------------------------
+2. ENVIRONMENT SETUP (and the Windows landmines)
+--------------------------------------------------------------------------------
+
+This machine is Windows with Python 3.14 (too new for the ML wheels) and neither
+pnpm nor uv installed. What I did and why:
+  - pnpm: `corepack` couldn't write into the admin-only Program Files\nodejs, so
+    I installed pnpm via `npm install -g pnpm` (lands in the user-writable
+    %AppData%\npm).
+  - uv: installed via `pip install uv`. uv's "managed Python" linking is buggy on
+    this box ("Missing expected target directory for Python minor version link"),
+    so I pointed uv at the concrete extracted interpreter:
+        uv sync --python "...\uv\python\cpython-3.12.13-...\python.exe"
+    That created agent/.venv on Python 3.12.13 with all deps.
+  - I added pytest + requests to agent/pyproject.toml (the runner needs pytest;
+    LinkUp/GitHub need requests).
+  - I made the dev workflow not depend on uv being on PATH at runtime:
+        scripts/run-agent.mjs  launches agent/.venv's python -m uvicorn directly
+        scripts/setup-agent.mjs best-effort `uv sync`, never fails the install
+        package.json: postinstall is a no-op; dev no longer runs `doctor`
+        .npmrc: verify-deps-before-run=false
+        pnpm-workspace.yaml: allowBuilds set to real booleans (esbuild/sharp on)
+    These were necessary because pnpm 11 kept re-running install (and its
+    failing postinstall) before every script, and blocked on unapproved builds.
+
+See memory/env-toolchain-workarounds.md for the exact commands.
+
+
+--------------------------------------------------------------------------------
+3. THE FIXTURES — the seeded BFS assignment (built first, on purpose)
+--------------------------------------------------------------------------------
+
+Everything else consumes the fixtures, so I built them first and validated them
+empirically before writing a line of agent code.
+
+  fixtures/peerreview/assignment-bfs/
+    brief.md               the assignment text (what students get)
+    rubric.json            structured rubric: 4 criteria, entry-point signature
+                           bfs_shortest_path(graph, start, goal), 10 marks
+    reference_solution.py  a TRUSTED correct BFS — the source of truth that
+                           generated tests must pass before freezing
+    tests_reference.py     the canonical test suite (see fair-testing below)
+
+  fixtures/peerreview/submission-dfs/solution.py
+    A realistic student submission that COMPILES and RUNS and returns a VALID
+    path — but uses recursive depth-first traversal, so on the trap graph it
+    returns A-B-C-D-E-G (5 edges) instead of the shortest A-F-G (2 edges).
+
+  fixtures/peerreview/submission-bfs-correct/solution.py
+    A correct BFS, used to confirm a good answer passes all 7 tests.
+
+  fixtures/peerreview/calibration-history/seed-01..05.json
+    5 prior "approved" reviews so the calibration panel is populated on the first
+    run (your refinement (d)).
+
+FAIR TESTING (your refinement (b)) — the crux of credibility:
+tests_reference.py asserts PATH PROPERTIES, never one exact path:
+   - endpoints are start & goal
+   - every consecutive pair is a real edge
+   - path length == minimal edge count (computed by an INDEPENDENT BFS inside
+     the test, so it doesn't trust the student's answer)
+   - returns None when unreachable; handles start==goal; terminates on cycles
+   - test_accepts_any_valid_shortest_path explicitly accepts EITHER valid
+     shortest path on a diamond graph
+The "minimal length" property is the ONE that a DFS fails — which is exactly the
+misconception we want to surface. I verified empirically (before building agents)
+that the reference passes 7/7 and the DFS submission fails ONLY
+test_path_is_minimal, with the message:
+   "AssertionError: path has 5 edges but the shortest is 2: ['A','B','C','D','E','G']"
+
+
+--------------------------------------------------------------------------------
+4. THE BACKEND — deterministic core, LLM only where it's safe
+--------------------------------------------------------------------------------
+
+Design principle: the decisions that CARRY MARKS are deterministic and derived
+from real evidence. Gemini is used for orchestration (which tool to call) and to
+polish PROSE (misconception explanation, feedback letter) — never to decide a
+score or a pass/fail. There is always a templated fallback so OFFLINE=1 runs the
+full flow with no key.
+
+agent/src/peerreview/
+  test_runner.py   The real-execution engine.
+     - run_pytest(): copies the submission + frozen tests into a temp dir, writes
+       a `student_entry.py` shim that re-exports the located entry function under
+       the name the tests import, runs `pytest --junitxml` in a SUBPROCESS with a
+       hard ~12s timeout (which also catches infinite loops), and parses per-test
+       pass/fail from the JUnit XML. Never raises — a crash/timeout becomes a
+       reported failure.
+     - validate_tests_against_reference(): runs the (generated/bundled) tests
+       against reference_solution.py. Any test the reference FAILS is invalid and
+       must not be frozen (your refinement (a)).
+     - build_graph_trace(): DETERMINISTIC, no LLM. Runs a reference BFS to get the
+       layer (distance) of every node and the expected shortest path, then runs
+       the STUDENT's function (subprocess) on the sample graph to capture what it
+       actually returns. Produces node positions (columns = BFS layer), edges,
+       expected path, student path. This is why the VisualGraphTracePanel is
+       trustworthy — it's measured, not hallucinated.
+     SECURITY: honest scope (your refinement (c)) is documented in the module
+     docstring — subprocess+timeout for controlled demos; Docker isolation is the
+     production path.
+
+  analysis.py     Evidence-based judgement (deterministic).
+     - detect_misconception(): from real test results + auditable code signals
+       (queue/deque present? recursive? "explore"/dfs naming? debug prints?).
+       Minimal-length test failed + endpoints OK + no queue  =>  dfs_instead_of_bfs.
+       Timeout => missing_visited_set. Unreachable test failed => missing case.
+     - propose_scores(): maps test outcomes + signals to each rubric criterion,
+       CLAMPED to its max. Correctness is capped at half when the minimal-length
+       test fails (shortest path is the core requirement). algorithmic_understanding
+       drops to 1/3 on a DFS. These map exactly to the seeded calibration history.
+     - build_feedback(): a warm, templated student letter; _maybe_polish() asks
+       Gemini to rewrite it WITHOUT changing facts/scores (online only).
+
+  linkup.py       reference_lookup(): POSTs to LinkUp's API for a sourced answer
+     on the assignment's concept. If no key / OFFLINE / failure, returns a bundled
+     reference flagged grounded=false ("offline reference"). Always carries the
+     guardrail ("explanation only, no scoring impact") — your refinement (e).
+
+  ingest.py       Three sources: ingest_seeded (fixture), ingest_pasted (a
+     {filename: source} object), ingest_github (fetches the repo tarball via the
+     GitHub API and extracts .py files). locate_entry() finds the file defining
+     the required function and the dotted module path to import it.
+
+  store.py        Persistence (local JSON under agent/data/peerreview/): freeze /
+     load workspaces, load+summarise calibration history, save feedback +
+     calibration records. Redis is the documented production swap behind this
+     small interface.
+
+  surfaces.py     Deterministic A2UI builders. A small Builder accumulates
+     component nodes (one with id="root"). build_setup_surface / build_review_surface
+     / build_final_surface turn structured data into trusted component trees —
+     reusing existing primitives (Stack/Card/Section/Badge/Callout/DataTable) and
+     the custom panels. WHY deterministic builders instead of letting the LLM emit
+     the tree? Reliability: the LLM produces the DATA; trusted Python produces the
+     LAYOUT. Handles variable-length data (N tests, N criteria) without prompt risk.
+
+  pipeline.py     Orchestration shared by the tools AND the offline stubs:
+     setup_workspace -> freeze_workspace ; review_submission -> finalize_feedback.
+     Keeps the in-flight draft/review in a small process-local cache; frozen
+     workspaces go to disk so the REVIEW agent picks up what the SETUP agent froze.
+
+  offline.py      OFFLINE=1 stub model. A deterministic router decides which tool
+     to call from the message history (first turn -> build/review; an
+     approve_workspace event -> freeze; approve_grades -> finalize). Lets the real
+     create_agent loop + real tools run with NO Gemini call.
+
+THE TWO AGENTS (agent/src/setup_agent.py, review_agent.py):
+  Each is a create_agent graph with a few tools that wrap the pipeline + a2ui.render,
+  a system prompt that drives the flow, and (online) a lazily-constructed Gemini
+  model so `import main` works with no key. agent/main.py registers them at
+  /setup and /review over AG-UI on :8123.
+
+
+--------------------------------------------------------------------------------
+5. THE A2UI CATALOG — reuse primitives, add a few high-value custom panels
+--------------------------------------------------------------------------------
+
+The starter's generic primitives (Stack, Row, Grid, Card, Section, Badge,
+Callout, BulletList, DataTable, StatCard, charts, Button) are powerful and
+composable, so I reused them for most of the cockpit and added only the panels
+that genuinely need custom rendering (definitions.ts + renderers.tsx):
+
+  - VisualGraphTracePanel  THE centrepiece. An SVG that lays nodes out in columns
+    by BFS layer, draws the expected shortest path (solid green) and the student's
+    returned path (dashed orange) over the graph, rings START/GOAL, and labels
+    each node's BFS distance. A DFS detour is visible at a glance.
+  - GradeApprovalPanel     Interactive (React state): per-criterion editable scores
+    with +/- steppers, "show failed tests" / "include LinkUp resource" toggles,
+    and an Approve button that dispatches approve_grades with the edited scores.
+  - TestResultsPanel       Pass/fail list with the real failure message.
+  - MisconceptionPanel     Severity + explanation + evidence bullets.
+  - ReferenceContextPanel  LinkUp answer + cited sources + the explanation-only
+    guardrail + a live/offline badge.
+  - CodeBlock              Monospace source view with line numbers.
+
+I also added data-a2ui-action to A2UI buttons so actions are testable/automatable.
+
+
+--------------------------------------------------------------------------------
+6. THE FRONTEND SHELL
+--------------------------------------------------------------------------------
+
+  - Rebranded the shell to PeerReview.ai (text wordmark, nav: Overview / 1·Setup /
+    2·Review / Catalog) and rewrote the landing page around the two phases.
+  - Two workspace pages: src/app/(pdf)/setup/page.tsx and .../review/page.tsx
+    (the (pdf) route group folder name is inherited; the routes are /setup, /review).
+    Each is the chat+canvas split with a control bar. Setup has "Load BFS
+    assignment". Review has "Seeded: DFS", "Seeded: correct BFS", "Upload folder…"
+    (reads .py files client-side), and a GitHub URL box. Buttons call
+    agent.addMessage()+agent.runAgent() to drive the agent.
+  - src/app/api/copilotkit-agents/route.ts points the CopilotKit runtime at the
+    setup/review agents on :8123. Providers register the mirror renderers and set
+    showDevConsole={false}.
+  - Removed the dead PDF/legal demo pages and the old runtime route.
+
+
+--------------------------------------------------------------------------------
+7. VERIFICATION (what I actually ran)
+--------------------------------------------------------------------------------
+
+  - Fixtures: ran pytest manually — reference 7/7 pass; DFS fails ONLY
+    test_path_is_minimal with the expected diagnostic.
+  - Backend pipeline (OFFLINE): setup -> freeze -> review -> finalize all succeed;
+    real test summary 6 passed / 1 failed; misconception dfs_instead_of_bfs; trace
+    student A-B-C-D-E-G vs expected A-F-G; scorecard 5/10; calibration 5 records;
+    feedback + calibration record written to disk.
+  - Agent graphs (OFFLINE): both build and emit a2ui_operations through the real
+    create_agent loop.
+  - tsc --noEmit: clean. pnpm install / typecheck: clean.
+  - FULL BROWSER RUN (OFFLINE, no keys), driven through the live UI:
+      landing -> Setup -> Load assignment (setup surface incl. LinkUp panel +
+      "All 7 tests pass against the reference — safe to freeze") -> Approve &
+      Freeze (wrote a new frozen workspace) -> Review -> Load DFS submission
+      (real pytest "6 passed, 1 failed · executed for real" with the real
+      assertion; SVG graph trace showing BFS vs DFS) -> edited Correctness 2->1
+      -> Approve grades -> final feedback letter + mark breakdown 4/10 saved to
+      agent/data/peerreview/feedback/.
+    Every required integration was exercised visibly: CopilotKit+AG-UI (the live
+    loop + actions), A2UI (every surface), LinkUp (the reference panel), and
+    human-in-the-loop (both approval gates).
+
+
+--------------------------------------------------------------------------------
+8. WHAT'S INTENTIONALLY STRETCH / NOT DONE (be honest with judges)
+--------------------------------------------------------------------------------
+
+  - Docker-isolated runner. Current runner is subprocess+timeout, fine for the
+    controlled demo submissions; arbitrary untrusted repos need the Docker path
+    documented in test_runner.py / README.
+  - Redis. Local JSON is used; Redis is the documented production upgrade for
+    checkpointing / caching / calibration memory.
+  - Arbitrary-assignment auto-structuring. Setup is reliable for the seeded
+    assignment (and any structured rubric you paste); turning an arbitrary
+    free-text brief into a rubric + reference solution + tests is a natural next
+    step (Gemini can draft them; validate_tests already gates them).
+  - Multi-file / nested submissions are ingested, but entry-point detection is
+    simple (first file defining the required function).
+
+To extend: add a new assignment under fixtures/peerreview/<name>/ (brief.md +
+rubric.json + reference_solution.py + tests_reference.py) and it works the same
+way. Add an A2UI panel by adding it to definitions.ts + renderers.tsx (+ a
+builder in surfaces.py).
+
+
+--------------------------------------------------------------------------------
+9. ONE-LINE PITCH
+--------------------------------------------------------------------------------
+
+PeerReview.ai is a Track-2 Generative UI product that turns CS-assignment marking
+into an agentic, evidence-based review cockpit: CopilotKit + AG-UI run the live
+loop, A2UI renders an assignment-specific marking interface the agent generates
+at runtime, LinkUp grounds the explanations, and human approval gates keep every
+mark fair, inspectable, and the TA's to make.
+================================================================================
