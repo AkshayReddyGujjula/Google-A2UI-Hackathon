@@ -1260,10 +1260,10 @@ const MisconceptionPanel = ({
 };
 
 type TraceNode = { id: string; x: number; y: number; layer?: number | null };
-
-const VisualGraphTracePanel = ({
-  props,
-}: RendererProps<{
+type GraphTrace = {
+  caseName?: string;
+  caseStatus?: string;
+  caseMessage?: string;
   nodes: TraceNode[];
   edges: { from: string; to: string }[];
   start?: string;
@@ -1274,12 +1274,52 @@ const VisualGraphTracePanel = ({
   studentEdges?: number | null;
   isMinimal?: boolean | null;
   studentError?: string | null;
+};
+
+const VisualGraphTracePanel = ({
+  props,
+}: RendererProps<{
+  caseName?: string;
+  caseStatus?: string;
+  caseMessage?: string;
+  nodes: TraceNode[];
+  edges: { from: string; to: string }[];
+  start?: string;
+  goal?: string;
+  expectedPath?: string[] | null;
+  studentPath?: string[] | null;
+  expectedEdges?: number | null;
+  studentEdges?: number | null;
+  isMinimal?: boolean | null;
+  studentError?: string | null;
+  traces?: GraphTrace[];
 }>) => {
   const W = 720;
   const H = 340;
   const PAD = 48;
   const R = 18;
-  const nodes = props.nodes ?? [];
+  const traces = props.traces?.length
+    ? props.traces
+    : [
+        {
+          caseName: props.caseName,
+          caseStatus: props.caseStatus,
+          caseMessage: props.caseMessage,
+          nodes: props.nodes ?? [],
+          edges: props.edges ?? [],
+          start: props.start,
+          goal: props.goal,
+          expectedPath: props.expectedPath,
+          studentPath: props.studentPath,
+          expectedEdges: props.expectedEdges,
+          studentEdges: props.studentEdges,
+          isMinimal: props.isMinimal,
+          studentError: props.studentError,
+        },
+      ];
+  const [selectedTrace, setSelectedTrace] = useState(0);
+  const active = traces[Math.min(selectedTrace, traces.length - 1)] ?? traces[0];
+  const nodes = active.nodes ?? [];
   const pos: Record<string, { x: number; y: number; layer: number | null }> = {};
   nodes.forEach((n) => {
     pos[n.id] = {
@@ -1293,28 +1333,46 @@ const VisualGraphTracePanel = ({
     if (Array.isArray(path)) for (let i = 0; i < path.length - 1; i++) s.add(`${path[i]}->${path[i + 1]}`);
     return s;
   };
-  const expected = pairs(props.expectedPath);
-  const student = pairs(props.studentPath);
+  const expected = pairs(active.expectedPath);
+  const student = pairs(active.studentPath);
   const LAYER = ["#ece9fc", "#d6cef8", "#bcb0f2", "#9d8eec", "#7c70f5"];
   const layerFill = (l: number | null) =>
     l == null ? "#e8e8ee" : LAYER[Math.min(l, LAYER.length - 1)];
 
   return (
     <div className="flex flex-col gap-3">
+      {traces.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+            Test case
+          </span>
+          <select
+            value={selectedTrace}
+            onChange={(e) => setSelectedTrace(Number(e.target.value))}
+            className="max-w-full rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-[12.5px] text-[var(--ink)]"
+          >
+            {traces.map((t, i) => (
+              <option key={`${t.caseName ?? "case"}-${i}`} value={i}>
+                {t.caseName ?? `Case ${i + 1}`} {t.caseStatus ? `(${t.caseStatus})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[12px] mono font-medium bg-[color-mix(in_oklab,var(--mint)_18%,white)] text-[#0a5d44] border-[color-mix(in_oklab,var(--mint)_70%,white)]">
-          expected (BFS): {props.expectedEdges ?? "?"} edges
+          expected (BFS): {active.expectedEdges ?? "?"} edges
         </span>
         <span
           className={clsx(
             "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[12px] mono font-medium",
-            props.isMinimal
+            active.isMinimal
               ? "bg-[color-mix(in_oklab,var(--mint)_18%,white)] text-[#0a5d44] border-[color-mix(in_oklab,var(--mint)_70%,white)]"
               : "bg-[color-mix(in_oklab,var(--orange)_16%,white)] text-[#7a3f0f] border-[color-mix(in_oklab,var(--orange)_55%,white)]",
           )}
         >
-          student: {props.studentEdges ?? (props.studentError ? "error" : "?")} edges
-          {props.isMinimal === false ? " · not minimal" : props.isMinimal ? " · minimal ✓" : ""}
+          student: {active.studentEdges ?? (active.studentError ? "error" : "?")} edges
+          {active.isMinimal === false ? " - not minimal" : active.isMinimal ? " - minimal" : ""}
         </span>
       </div>
 
@@ -1328,7 +1386,7 @@ const VisualGraphTracePanel = ({
 
           {/* layer guide bands */}
           {/* edges */}
-          {props.edges.map((e, i) => {
+          {active.edges.map((e, i) => {
             const a = pos[e.from];
             const b = pos[e.to];
             if (!a || !b) return null;
@@ -1356,8 +1414,8 @@ const VisualGraphTracePanel = ({
           {/* nodes */}
           {nodes.map((n) => {
             const p = pos[n.id];
-            const isStart = n.id === props.start;
-            const isGoal = n.id === props.goal;
+            const isStart = n.id === active.start;
+            const isGoal = n.id === active.goal;
             return (
               <g key={n.id}>
                 <circle
@@ -1400,8 +1458,11 @@ const VisualGraphTracePanel = ({
         <span className="flex items-center gap-1.5"><span className="w-5 border-t-2 border-dashed border-[#e08a2b]" /> student&apos;s returned path</span>
         <span className="flex items-center gap-1.5">L<em className="not-italic">n</em> = BFS distance from start</span>
       </div>
-      {props.studentError && (
-        <p className="text-[12px] text-[#7a1b22] mono">student function error: {props.studentError}</p>
+      {active.studentError && (
+        <p className="text-[12px] text-[#7a1b22] mono">student function error: {active.studentError}</p>
+      )}
+      {active.caseMessage && (
+        <p className="text-[12px] text-[var(--ink-2)] mono">{active.caseMessage}</p>
       )}
     </div>
   );
@@ -1503,6 +1564,52 @@ const GradeApprovalPanel = ({
   );
 };
 
+const CaseComparisonPanel = ({
+  props,
+}: RendererProps<{
+  cases: { name: string; status: string; input: string; expected: string; actual: string }[];
+}>) => {
+  const cases = props.cases ?? [];
+  return (
+    <div className="flex flex-col gap-2">
+      {cases.map((c, i) => {
+        const passed = c.status === "passed";
+        return (
+          <div
+            key={i}
+            className={clsx(
+              "rounded-[var(--radius)] border px-3 py-2.5",
+              passed
+                ? "border-[var(--line)] bg-[var(--surface)]"
+                : "border-[color-mix(in_oklab,var(--red)_45%,white)] bg-[color-mix(in_oklab,var(--red)_6%,var(--surface))]",
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span className={clsx("w-2 h-2 rounded-full shrink-0", passed ? "bg-[#28c840]" : "bg-[#d54b53]")} />
+              <span className="text-[13px] font-medium text-[var(--ink)] flex-1 min-w-0 truncate">{c.name}</span>
+              <span className={clsx("mono text-[10.5px] font-semibold tracking-wider", passed ? "text-[#0a5d44]" : "text-[#7a1b22]")}>
+                {passed ? "PASS" : "FAIL"}
+              </span>
+            </div>
+            <div className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[12px] mono">
+              <span className="text-[var(--ink)]">input</span>
+              <span className="text-[var(--ink-2)] truncate">{c.input}</span>
+              <span className="text-[var(--ink)]">expected</span>
+              <span className="text-[#0a5d44] truncate">{c.expected}</span>
+              {!passed && (
+                <>
+                  <span className="text-[var(--ink)]">actual</span>
+                  <span className="text-[#7a1b22] truncate">{c.actual}</span>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 function Slot({ render }: { render: ReactNode }) {
   return <>{render}</>;
 }
@@ -1535,4 +1642,5 @@ export const renderers = {
   MisconceptionPanel,
   VisualGraphTracePanel,
   GradeApprovalPanel,
+  CaseComparisonPanel,
 };

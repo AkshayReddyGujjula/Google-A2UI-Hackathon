@@ -1,9 +1,14 @@
-/** Client-side PDF → text extraction. Loaded lazily so the page bundle
- *  stays small.  Used inside CopilotChat's `attachments.onUpload`. */
-export async function extractPdfText(file: File): Promise<{
-  text: string;
-  pages: number;
-}> {
+/** Client-side document → text extraction for the uploaded assessment doc.
+ *  Supports PDF (via pdfjs, loaded lazily) and plain text / markdown. */
+export async function extractDocText(file: File): Promise<{ text: string; pages: number }> {
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".pdf")) return extractPdfText(file);
+  // text / markdown / anything readable as text
+  const text = await file.text();
+  return { text, pages: 1 };
+}
+
+export async function extractPdfText(file: File): Promise<{ text: string; pages: number }> {
   const buf = await file.arrayBuffer();
   // @ts-expect-error pdfjs ships its own types via a custom export
   const pdfjs = await import("pdfjs-dist/build/pdf.mjs");

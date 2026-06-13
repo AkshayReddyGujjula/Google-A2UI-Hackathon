@@ -53,16 +53,18 @@ export function SurfaceCanvas({
             content: humanizeAction(ua.name, labelHint),
           });
         }
-        void agent
-          .runAgent({
-            forwardedProps: { a2uiAction: message },
-          })
-          .then(() =>
-            console.log(`[surface-canvas] runAgent resolved for ${channel}`),
-          )
-          .catch((err) => {
-            console.warn("[surface-canvas] runAgent failed", err);
-          });
+        window.setTimeout(() => {
+          void agent
+            .runAgent({
+              forwardedProps: { a2uiAction: message },
+            })
+            .then(() =>
+              console.log(`[surface-canvas] runAgent resolved for ${channel}`),
+            )
+            .catch((err) => {
+              console.warn("[surface-canvas] runAgent failed", err);
+            });
+        }, 0);
       }}
     >
       <CanvasInner channel={channel} emptyState={emptyState} />

@@ -336,3 +336,59 @@ loop, A2UI renders an assignment-specific marking interface the agent generates
 at runtime, LinkUp grounds the explanations, and human approval gates keep every
 mark fair, inspectable, and the TA's to make.
 ================================================================================
+
+
+--------------------------------------------------------------------------------
+10. FINAL LIVE DEMO HARDENING PASS
+--------------------------------------------------------------------------------
+
+The current demo is prepared for live-mode use with `GEMINI_API_KEY` present and
+no `OFFLINE=1` in `.env`.
+
+Frontend readiness:
+  - Setup and Review now expose an agent connection state.
+  - Load/review controls are disabled until CopilotKit has connected the agent.
+  - First-click actions are deferred after `addMessage()` so a hard-refresh click
+    reliably reaches the LangGraph agent.
+  - Upload and GitHub failures render inline notices instead of quiet no-ops.
+
+Submission inputs:
+  - `demo-submissions/` contains TA-uploadable folders for the headline DFS
+    misconception, correct BFS, missing unreachable case, cycle timeout/no
+    visited set, and off-by-one missing-goal path bug.
+  - Folder upload is validated client-side for `.py` files before the review
+    request is sent.
+  - Public GitHub URLs are parsed more leniently (`https://github.com/user/repo`,
+    `.git`, shorthand `github.com/user/repo`, and SSH-style GitHub URLs) and
+    produce readable errors for invalid/private/no-Python repos.
+
+Backend readiness:
+  - Pasted/uploaded submissions sanitize paths, enforce file/byte caps, and
+    reject folders with no Python files.
+  - Runner timeouts, startup crashes, imports, and collection errors become
+    visible failed test rows so the UI never implies a clean `0/0 tests` review.
+  - Endpoint/path-construction failures have a deterministic misconception label.
+  - Gemini response parts are normalized to plain text before rendering feedback,
+    so provider metadata such as typed parts/signatures is not exposed to TAs.
+
+Validation:
+  - `pnpm typecheck`
+  - `pnpm test:widgets`
+  - `pnpm smoke`
+  - Demo submission pipeline check:
+      correct-bfs: 7/7
+      dfs-instead-of-bfs: 6/7, `dfs_instead_of_bfs`
+      missing-unreachable-none: 6/7, `missing_unreachable_case`
+      cycle-timeout-no-visited: timeout, `missing_visited_set`
+      off-by-one-missing-goal: endpoint/path bug
+
+Use `DEMO.md` as the exact live click-through script.
+
+
+
+
+
+
+
+
+

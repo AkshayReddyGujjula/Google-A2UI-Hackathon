@@ -42,11 +42,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jakarta.variable} ${splineMono.variable}`}>
       <head>
-        <title>CopilotKit</title>
+        <title>PeerReview.ai</title>
         <link
           rel="icon"
-          type="image/svg+xml"
-          href="/copilotkit-logo-mark.svg"
+          href="/favicon.ico"
         />
       </head>
       <body className={`antialiased`}>

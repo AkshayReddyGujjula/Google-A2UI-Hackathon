@@ -36,6 +36,8 @@ const WIDGET_DIRS = [
   join(REPO_ROOT, "other-examples", "legal-contract-review", "schemas"),
 ];
 const VALIDATE_SCRIPT = join(__dirname, "validate-widget.ts");
+const PNPM = process.platform === "win32" ? "cmd.exe" : "pnpm";
+const PNPM_PREFIX = process.platform === "win32" ? ["/d", "/s", "/c", "pnpm"] : [];
 
 const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
@@ -93,8 +95,8 @@ function main(): void {
   // we have until the full Playwright harness lands. We exec tsx via pnpm so
   // we pick up the locally-installed tsx (or the dlx cache if not yet linked).
   const result = spawnSync(
-    "pnpm",
-    ["exec", "tsx", VALIDATE_SCRIPT, ...fixtures],
+    PNPM,
+    [...PNPM_PREFIX, "exec", "tsx", VALIDATE_SCRIPT, ...fixtures],
     { stdio: "inherit", cwd: REPO_ROOT },
   );
 

@@ -2,13 +2,11 @@
 /**
  * pnpm smoke — Composite gate, the load-bearing CI check.
  *
- * pdf-analyst default swap: the default demo is now the FastAPI agent at
- * `agent/main.py` (POST /fixed, /dynamic, /legal on :8123), not the archived
- * PortKit langgraph-cli agent (now under other-examples/portkit/). The
- * langgraph.json graph probe was replaced by a FastAPI endpoint-registration
- * check (import the app, assert the three routes register — no live Gemini
- * call). Steps that need a running, Gemini-backed agent are SKIPs, gated
- * behind an env check, so smoke is exit-0 statically with no API key.
+ * PeerReview.ai default: the FastAPI agent at `agent/main.py` exposes
+ * POST /setup and /review on :8123. Smoke imports the app, checks those
+ * endpoints, and verifies the OFFLINE setup graph emits a real A2UI surface.
+ * Steps that need a running, Gemini-backed agent are SKIPs, gated behind an
+ * env check, so smoke is exit-0 statically with no API key.
  *
  * Runs (in order, failing fast):
  *   1. `pnpm verify-pins`               — lockfile / package.json drift
@@ -22,13 +20,13 @@
  *                                         structure if present; SKIPPED when absent
  *                                         (it was archived with PortKit)
  *   6. agent endpoint probe             — import agent/main.py's FastAPI app and assert
- *                                         /fixed, /dynamic, /legal are registered
+ *                                         /setup and /review are registered
  *                                         (static import; no live model call)
- *   6a. offline /fixed probe            — with OFFLINE=1 and GEMINI_API_KEY removed,
- *                                         import the /fixed graph and invoke it
+ *   6a. offline /setup probe            — with OFFLINE=1 and GEMINI_API_KEY removed,
+ *                                         import the setup graph and invoke it
  *                                         in-process; assert the tool result carries
  *                                         real A2UI surface ops (createSurface /
- *                                         updateComponents / updateDataModel). FAILS
+ *                                         updateComponents). FAILS
  *                                         loudly if the no-key offline path errors or
  *                                         emits no surface. No uvicorn, no port, no key.
  *   7. agent connectivity probe (live)  — SKIPPED when OFFLINE=1 or no GEMINI_API_KEY
@@ -47,6 +45,8 @@ const YELLOW = "\x1b[33m";
 const DIM = "\x1b[2m";
 const BOLD = "\x1b[1m";
 const RESET = "\x1b[0m";
+const PNPM = process.platform === "win32" ? "cmd.exe" : "pnpm";
+const PNPM_PREFIX = process.platform === "win32" ? ["/d", "/s", "/c", "pnpm"] : [];
 
 type Step = {
   name: string;
@@ -57,7 +57,7 @@ const results: { name: string; pass: boolean; detail: string }[] = [];
 
 function pnpmRun(scriptName: string, ...args: string[]): { pass: boolean; detail: string } {
   // Use the local pnpm exec form so we don't hit recursive `pnpm` lookup issues.
-  const res = spawnSync("pnpm", ["run", scriptName, ...args], {
+  const res = spawnSync(PNPM, [...PNPM_PREFIX, "run", scriptName, ...args], {
     cwd: REPO_ROOT,
     stdio: "inherit",
     env: { ...process.env, FORCE_COLOR: "1" },
@@ -78,6 +78,70 @@ function shellRun(cmd: string, args: string[], opts: { cwd?: string } = {}): { p
     pass: res.status === 0,
     detail: res.status === 0 ? "passed" : `failed (exit ${res.status})`,
   };
+}
+
+function verifyPinsInline(): { pass: boolean; detail: string } {
+  const pkgPath = join(REPO_ROOT, "package.json");
+  const uvLockPath = join(REPO_ROOT, "agent", "uv.lock");
+  const lockPath = join(REPO_ROOT, "pnpm-lock.yaml");
+  const pkg = JSON.parse(readFileSync(pkgPath, "utf-8")) as {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+  };
+  const deps = { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) };
+  const jsPins = [
+    ["@copilotkit/react-core", "1.57.4"],
+    ["@copilotkit/runtime", "1.57.4"],
+    ["@copilotkit/a2ui-renderer", "1.57.4"],
+    ["@copilotkit/react-ui", "1.57.4"],
+    ["next", "16.1.6"],
+    ["react", "19.2.4"],
+    ["react-dom", "19.2.4"],
+  ] as const;
+  const pyPins = [
+    ["langchain", "1.3.1"],
+    ["langchain-core", "1.4.0"],
+    ["langgraph", "1.2.1"],
+  ] as const;
+
+  let drift = 0;
+  for (const [name, expected] of jsPins) {
+    const actual = deps[name];
+    if (actual !== expected) {
+      console.log(`${RED}DRIFT:${RESET} ${name} is ${actual ?? "(missing)"} but FROZEN.md pins ${expected}`);
+      drift++;
+    } else {
+      console.log(`${GREEN}OK:${RESET} ${name} @ ${actual}`);
+    }
+  }
+  if (!existsSync(lockPath)) {
+    console.log(`${RED}DRIFT:${RESET} pnpm-lock.yaml missing`);
+    drift++;
+  }
+  if (!existsSync(uvLockPath)) {
+    console.log(`${RED}DRIFT:${RESET} agent/uv.lock missing`);
+    drift++;
+  } else {
+    const uvLock = readFileSync(uvLockPath, "utf-8");
+    const uvPackages = new Map<string, string>();
+    for (const block of uvLock.split(/\r?\n\[\[package\]\]\r?\n/)) {
+      const name = block.match(/^name = "([^"]+)"/m)?.[1];
+      const version = block.match(/^version = "([^"]+)"/m)?.[1];
+      if (name && version) uvPackages.set(name, version);
+    }
+    for (const [name, expected] of pyPins) {
+      const actual = uvPackages.get(name);
+      if (actual !== expected) {
+        console.log(`${RED}DRIFT:${RESET} ${name} is ${actual ?? "(missing)"} in agent/uv.lock but FROZEN.md pins ${expected}`);
+        drift++;
+      } else {
+        console.log(`${GREEN}OK:${RESET} ${name} @ ${actual} ${DIM}(agent/uv.lock)${RESET}`);
+      }
+    }
+  }
+  return drift === 0
+    ? { pass: true, detail: "all pins match FROZEN.md" }
+    : { pass: false, detail: `${drift} pin drift item(s)` };
 }
 
 // Widget/schema dirs to validate JSON under, in the pdf-analyst layout. The
@@ -106,27 +170,22 @@ function findWidgetJsons(): string[] {
   return out;
 }
 
-// The FastAPI endpoints the pdf-analyst default agent must register. The
-// endpoint probe (below) imports agent/main.py and asserts each of these
-// resolves to a registered route. /fixed + /dynamic are the pdf-analyst
-// surfaces; /legal is the in-repo legal-contract-review example, registered
-// defensively (main.py logs + skips it if its cross-example import fails).
-const REQUIRED_AGENT_ENDPOINTS = ["/fixed", "/dynamic"];
-const OPTIONAL_AGENT_ENDPOINTS = ["/legal"];
+// The FastAPI endpoints the PeerReview.ai app must register.
+const REQUIRED_AGENT_ENDPOINTS = ["/setup", "/review"];
+const OPTIONAL_AGENT_ENDPOINTS: string[] = [];
 
 const STEPS: Step[] = [
   {
     name: "verify-pins",
-    run: async () =>
-      shellRun(join(REPO_ROOT, "scripts", "verify-pins.sh"), []),
+    run: async () => verifyPinsInline(),
   },
   {
     name: "validate-widget --examples (other-examples/*/EXAMPLE.json)",
     run: async () => {
       const validateScript = join(REPO_ROOT, "scripts", "validate-widget.ts");
       const res = spawnSync(
-        "pnpm",
-        ["exec", "tsx", validateScript, "--examples"],
+        PNPM,
+        [...PNPM_PREFIX, "exec", "tsx", validateScript, "--examples"],
         { cwd: REPO_ROOT, stdio: "inherit", env: { ...process.env, FORCE_COLOR: "1" } },
       );
       return {
@@ -147,8 +206,8 @@ const STEPS: Step[] = [
       }
       const validateScript = join(REPO_ROOT, "scripts", "validate-widget.ts");
       const res = spawnSync(
-        "pnpm",
-        ["exec", "tsx", validateScript, ...widgets],
+        PNPM,
+        [...PNPM_PREFIX, "exec", "tsx", validateScript, ...widgets],
         { cwd: REPO_ROOT, stdio: "inherit", env: { ...process.env, FORCE_COLOR: "1" } },
       );
       return {
@@ -168,7 +227,7 @@ const STEPS: Step[] = [
       // live seam headings ("## §N — Title"). It silently rotted once when
       // the doc's heading style changed — this step makes that loud.
       const explainScript = join(REPO_ROOT, "scripts", "explain.ts");
-      const res = spawnSync("pnpm", ["exec", "tsx", explainScript, "themes"], {
+      const res = spawnSync(PNPM, [...PNPM_PREFIX, "exec", "tsx", explainScript, "themes"], {
         cwd: REPO_ROOT,
         stdio: "pipe",
         env: { ...process.env, FORCE_COLOR: "0" },
@@ -279,7 +338,7 @@ const STEPS: Step[] = [
     },
   },
   {
-    name: "agent endpoint probe (FastAPI /fixed + /dynamic [+ /legal])",
+    name: "agent endpoint probe (FastAPI /setup + /review)",
     run: async () => {
       // pdf-analyst default swap: the agent is now the FastAPI app at
       // agent/main.py, not a langgraph-cli graph. Assert it imports cleanly
@@ -295,7 +354,10 @@ const STEPS: Step[] = [
         );
         return { pass: true, detail: "skipped (no agent/main.py)" };
       }
-      const venvPython = join(agentDir, ".venv", "bin", "python");
+      const venvPython =
+        process.platform === "win32"
+          ? join(agentDir, ".venv", "Scripts", "python.exe")
+          : join(agentDir, ".venv", "bin", "python");
       const pythonBin = existsSync(venvPython) ? venvPython : "python3";
       if (!existsSync(venvPython)) {
         console.log(
@@ -375,14 +437,14 @@ sys.exit(0)
     },
   },
   {
-    name: "offline /fixed probe (OFFLINE=1, no key → real A2UI surface)",
+    name: "offline /setup probe (OFFLINE=1, no key → real A2UI surface)",
     run: async () => {
       // The OFFLINE=1 gate. The endpoint probe above proves the app IMPORTS;
-      // this proves the /fixed graph actually PAINTS a surface offline. It
-      // imports the /fixed graph and invokes it in-process (no uvicorn, no
+      // this proves the setup graph actually PAINTS a surface offline. It
+      // imports the setup graph and invokes it in-process (no uvicorn, no
       // port) with OFFLINE=1 and GEMINI_API_KEY explicitly removed, then
       // asserts the emitted tool result carries the A2UI surface ops
-      // (a2ui_operations / createSurface / updateComponents / updateDataModel).
+      // (a2ui_operations / createSurface / updateComponents).
       // This closes the "smoke green while `dev` fails" gap: a regression that
       // breaks the no-key offline emission (e.g. an eager Gemini client or a
       // broken stub) FAILS here loudly.
@@ -390,11 +452,14 @@ sys.exit(0)
       const mainPy = join(agentDir, "main.py");
       if (!existsSync(mainPy)) {
         console.log(
-          `${YELLOW}!${RESET} ${DIM}agent/main.py not found. Skipping offline /fixed probe.${RESET}\n`,
+          `${YELLOW}!${RESET} ${DIM}agent/main.py not found. Skipping offline /setup probe.${RESET}\n`,
         );
         return { pass: true, detail: "skipped (no agent/main.py)" };
       }
-      const venvPython = join(agentDir, ".venv", "bin", "python");
+      const venvPython =
+        process.platform === "win32"
+          ? join(agentDir, ".venv", "Scripts", "python.exe")
+          : join(agentDir, ".venv", "bin", "python");
       const pythonBin = existsSync(venvPython) ? venvPython : "python3";
       if (!existsSync(venvPython)) {
         console.log(
@@ -406,39 +471,39 @@ import sys
 
 try:
     from langchain_core.messages import HumanMessage, ToolMessage
-    from src.fixed_agent import graph
+    from src.setup_agent import graph
 except Exception as e:
     import traceback
     traceback.print_exc()
-    print(f"\\nFAIL: importing the /fixed graph (OFFLINE=1, no key) raised {type(e).__name__}: {e}")
+    print(f"\\nFAIL: importing the setup graph (OFFLINE=1, no key) raised {type(e).__name__}: {e}")
     sys.exit(1)
 
 try:
     result = graph.invoke(
-        {"messages": [HumanMessage("show the dashboard")]},
-        config={"configurable": {"thread_id": "smoke-offline"}},
+        {"messages": [HumanMessage("Set up the BFS marking workspace.")]},
+        config={"configurable": {"thread_id": "smoke-offline-setup"}},
     )
 except Exception as e:
     import traceback
     traceback.print_exc()
-    print(f"\\nFAIL: invoking the offline /fixed graph raised {type(e).__name__}: {e}")
+    print(f"\\nFAIL: invoking the offline setup graph raised {type(e).__name__}: {e}")
     sys.exit(1)
 
 tool_msgs = [m for m in result.get("messages", []) if isinstance(m, ToolMessage)]
 if not tool_msgs:
-    print("FAIL: offline /fixed produced no ToolMessage — no A2UI surface emitted.")
+    print("FAIL: offline setup produced no ToolMessage — no A2UI surface emitted.")
     sys.exit(1)
 
 content = "".join(str(m.content) for m in tool_msgs)
-markers = ["a2ui_operations", "createSurface", "updateComponents", "updateDataModel"]
+markers = ["a2ui_operations", "createSurface", "updateComponents"]
 missing = [mk for mk in markers if mk not in content]
 if missing:
-    print(f"FAIL: offline /fixed tool result is missing A2UI surface markers: {missing}")
+    print(f"FAIL: offline setup tool result is missing A2UI surface markers: {missing}")
     sys.exit(1)
 
 for mk in markers:
     print(f"  OK: {mk}")
-print("\\nOffline /fixed emitted a real A2UI surface (no key, OFFLINE=1).")
+print("\\nOffline setup emitted a real A2UI surface (no key, OFFLINE=1).")
 sys.exit(0)
 `;
       // Explicitly REMOVE the key so this proves the no-key path. Unlike the
@@ -458,14 +523,14 @@ sys.exit(0)
         env: offlineEnv,
       });
       if (res.status === 0) {
-        return { pass: true, detail: "offline /fixed painted a real A2UI surface (no key)" };
+        return { pass: true, detail: "offline /setup painted a real A2UI surface (no key)" };
       }
       if (res.status === 1) {
-        return { pass: false, detail: "offline /fixed did not emit an A2UI surface (no key)" };
+        return { pass: false, detail: "offline /setup did not emit an A2UI surface (no key)" };
       }
       // Non-1 exit: probe couldn't run (missing venv/python). Warn, don't fail.
       console.log(
-        `${YELLOW}!${RESET} ${DIM}offline /fixed probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
+        `${YELLOW}!${RESET} ${DIM}offline /setup probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
       );
       return { pass: true, detail: `skipped (probe exit ${res.status})` };
     },

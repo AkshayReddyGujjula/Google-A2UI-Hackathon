@@ -106,6 +106,23 @@ Open **http://localhost:3000**.
 Other submission inputs on the Review tab: **Upload folder…** (pick a folder of
 `.py` files) and a **public GitHub repo URL**.
 
+For the live demo, use the ready-made upload folders in `demo-submissions/`.
+They cover the headline DFS misconception, a correct BFS solution, a missing
+unreachable-case bug, a timeout caused by no visited set, and an endpoint/path
+construction bug. See `DEMO.md` for the exact click-through script.
+
+GitHub review accepts public GitHub repository URLs that contain Python files and
+define `bfs_shortest_path(graph, start, goal)`. Invalid URLs, private repos,
+repos with no `.py` files, and submissions missing the required function are
+reported inline instead of producing an empty review.
+
+### Live mode
+
+For the judged demo, `.env` should contain `GEMINI_API_KEY` and should not set
+`OFFLINE=1`. Offline mode remains available as the venue-wifi fallback, but the
+live path exercises Gemini prose/orchestration plus the same deterministic test
+execution and scoring engine.
+
 ### Offline mode (no API key — venue-wifi safety net)
 
 Set `OFFLINE=1` in `.env`. The **entire** demo runs with no Gemini/LinkUp calls:

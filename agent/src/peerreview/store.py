@@ -1,209 +1,179 @@
-"""Persistence + fixtures for PeerReview.ai.
+"""Local-JSON persistence for the workspace/submission directory model.
 
-MVP uses local JSON under agent/data/peerreview/. The hackathon plan documents
-Redis (LangGraph checkpointer / LangCache / mem0) as the production upgrade for
-checkpointing, caching and assignment memory; the interface here is small
-enough to swap behind Redis later without touching the agents.
+Layout (everything the TA creates lives here; nothing is preloaded):
+  agent/data/peerreview/workspaces/<wid>/assignment.json
+  agent/data/peerreview/workspaces/<wid>/submissions/<sid>.json
+
+An assignment workspace is a "folder"; submissions are the "files" inside it.
+Calibration memory is derived live from the workspace's own approved reviews.
+Redis is the documented production upgrade behind this small interface.
 """
 from __future__ import annotations
 
 import json
+import re
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
-# agent/src/peerreview/store.py -> parents[3] == repo root
 ROOT = Path(__file__).resolve().parents[3]
-FIXTURES = ROOT / "fixtures" / "peerreview"
 DATA = ROOT / "agent" / "data" / "peerreview"
 WORKSPACES = DATA / "workspaces"
-FEEDBACK = DATA / "feedback"
-CALIBRATION = DATA / "calibration"
 
 
-def _ensure_dirs() -> None:
-    for d in (WORKSPACES, FEEDBACK, CALIBRATION):
-        d.mkdir(parents=True, exist_ok=True)
+def _now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
-# ── fixtures (seeded demo data) ────────────────────────────────────────────────
-def list_assignments() -> list[dict[str, Any]]:
-    """Available seeded assignments (each dir under fixtures with a rubric)."""
+def _slug(text: str) -> str:
+    s = re.sub(r"[^a-z0-9]+", "-", (text or "assignment").lower()).strip("-")
+    return (s[:32] or "assignment") + "-" + uuid.uuid4().hex[:6]
+
+
+def _wdir(wid: str) -> Path:
+    return WORKSPACES / wid
+
+
+# ── workspaces (assignments) ──────────────────────────────────────────────────────
+def create_workspace(spec: dict[str, Any]) -> dict[str, Any]:
+    wid = spec.get("id") or _slug(spec.get("title", "assignment"))
+    spec["id"] = wid
+    spec["created_at"] = spec.get("created_at") or _now()
+    spec["status"] = spec.get("status") or "draft"
+    d = _wdir(wid)
+    (d / "submissions").mkdir(parents=True, exist_ok=True)
+    (d / "assignment.json").write_text(json.dumps(spec, indent=2), encoding="utf-8")
+    return spec
+
+
+def get_workspace(wid: str) -> dict[str, Any] | None:
+    p = _wdir(wid) / "assignment.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def update_workspace(wid: str, patch: dict[str, Any]) -> dict[str, Any] | None:
+    ws = get_workspace(wid)
+    if not ws:
+        return None
+    ws.update(patch)
+    ws["updated_at"] = _now()
+    (_wdir(wid) / "assignment.json").write_text(json.dumps(ws, indent=2), encoding="utf-8")
+    return ws
+
+
+def freeze_workspace(wid: str) -> dict[str, Any] | None:
+    return update_workspace(wid, {"status": "frozen", "frozen_at": _now()})
+
+
+def list_workspaces() -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
-    base = FIXTURES
-    if not base.exists():
+    if not WORKSPACES.exists():
         return out
-    for d in sorted(base.iterdir()):
-        rubric = d / "rubric.json"
-        if d.is_dir() and rubric.exists():
-            r = json.loads(rubric.read_text(encoding="utf-8"))
-            out.append({"dir": d.name, "assignment_id": r.get("assignment_id"), "title": r.get("title")})
+    for d in WORKSPACES.iterdir():
+        ap = d / "assignment.json"
+        if not ap.exists():
+            continue
+        ws = json.loads(ap.read_text(encoding="utf-8"))
+        subs = list_submissions(ws["id"])
+        out.append({
+            "id": ws["id"], "title": ws.get("title", "Untitled"),
+            "status": ws.get("status", "draft"),
+            "assignment_type": ws.get("assignment_type", "general"),
+            "created_at": ws.get("created_at", ""),
+            "submission_count": len(subs),
+            "marked_count": sum(1 for s in subs if s.get("status") == "approved"),
+        })
+    out.sort(key=lambda w: w.get("created_at", ""), reverse=True)
     return out
 
 
-def load_assignment_fixture(dir_name: str = "assignment-bfs") -> dict[str, Any]:
-    """Load a seeded assignment: brief text, structured rubric, reference
-    solution source, and the canonical validated test suite source."""
-    d = FIXTURES / dir_name
-    rubric = json.loads((d / "rubric.json").read_text(encoding="utf-8"))
-    brief = (d / "brief.md").read_text(encoding="utf-8") if (d / "brief.md").exists() else ""
-    ref = (d / "reference_solution.py").read_text(encoding="utf-8") if (d / "reference_solution.py").exists() else ""
-    tests = (d / "tests_reference.py").read_text(encoding="utf-8") if (d / "tests_reference.py").exists() else ""
-    return {
-        "dir": dir_name,
-        "brief": brief,
-        "rubric": rubric,
-        "reference_solution": ref,
-        "tests_source": tests,
-    }
-
-
-def load_submission_fixture(dir_name: str) -> dict[str, Any]:
-    """Load every .py file under a seeded submission directory."""
-    d = FIXTURES / dir_name
-    files: dict[str, str] = {}
+def delete_workspace(wid: str) -> bool:
+    import shutil
+    d = _wdir(wid)
     if d.exists():
-        for p in sorted(d.rglob("*.py")):
-            files[p.relative_to(d).as_posix()] = p.read_text(encoding="utf-8")
-    return {"source": dir_name, "files": files}
+        shutil.rmtree(d)
+        return True
+    return False
 
 
-# ── frozen workspaces ──────────────────────────────────────────────────────────
-def freeze_workspace(workspace: dict[str, Any]) -> dict[str, Any]:
-    """Persist an approved workspace (rubric + validated frozen tests +
-    reference solution + entry point). Returns the stored record."""
-    _ensure_dirs()
-    wid = workspace.get("workspace_id") or f"ws-{int(time.time())}"
-    workspace["workspace_id"] = wid
-    workspace["frozen_at"] = workspace.get("frozen_at") or _now()
-    workspace["status"] = "frozen"
-    (WORKSPACES / f"{wid}.json").write_text(
-        json.dumps(workspace, indent=2), encoding="utf-8"
-    )
-    return workspace
+# ── submissions ─────────────────────────────────────────────────────────────────
+def add_submission(wid: str, record: dict[str, Any]) -> dict[str, Any]:
+    sid = record.get("id") or ("sub-" + uuid.uuid4().hex[:8])
+    record["id"] = sid
+    record["created_at"] = record.get("created_at") or _now()
+    record["status"] = record.get("status") or "pending"
+    (_wdir(wid) / "submissions").mkdir(parents=True, exist_ok=True)
+    (_wdir(wid) / "submissions" / f"{sid}.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
+    return record
 
 
-def load_workspace(workspace_id: str) -> dict[str, Any] | None:
-    p = WORKSPACES / f"{workspace_id}.json"
-    if not p.exists():
+def get_submission(wid: str, sid: str) -> dict[str, Any] | None:
+    p = _wdir(wid) / "submissions" / f"{sid}.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def update_submission(wid: str, sid: str, patch: dict[str, Any]) -> dict[str, Any] | None:
+    sub = get_submission(wid, sid)
+    if not sub:
         return None
-    return json.loads(p.read_text(encoding="utf-8"))
+    sub.update(patch)
+    sub["updated_at"] = _now()
+    (_wdir(wid) / "submissions" / f"{sid}.json").write_text(json.dumps(sub, indent=2), encoding="utf-8")
+    return sub
 
 
-def latest_workspace(assignment_id: str | None = None) -> dict[str, Any] | None:
-    """Most recently frozen workspace, optionally filtered by assignment."""
-    if not WORKSPACES.exists():
-        return None
-    best: tuple[float, dict[str, Any]] | None = None
-    for p in WORKSPACES.glob("*.json"):
-        rec = json.loads(p.read_text(encoding="utf-8"))
-        if assignment_id and rec.get("assignment_id") != assignment_id:
+def list_submissions(wid: str) -> list[dict[str, Any]]:
+    d = _wdir(wid) / "submissions"
+    out: list[dict[str, Any]] = []
+    if not d.exists():
+        return out
+    for p in d.glob("*.json"):
+        s = json.loads(p.read_text(encoding="utf-8"))
+        out.append({
+            "id": s["id"], "name": s.get("name", s["id"]), "source": s.get("source", ""),
+            "status": s.get("status", "pending"),
+            "total": s.get("total"), "max_total": s.get("max_total"),
+            "created_at": s.get("created_at", ""),
+        })
+    out.sort(key=lambda s: s.get("created_at", ""))
+    return out
+
+
+# ── calibration (derived live from this workspace's approved reviews) ──────────────
+def load_calibration_history(wid: str) -> list[dict[str, Any]]:
+    records = []
+    for s in list_submissions(wid):
+        if s.get("status") != "approved":
             continue
-        mtime = p.stat().st_mtime
-        if best is None or mtime > best[0]:
-            best = (mtime, rec)
-    return best[1] if best else None
-
-
-# ── calibration memory ─────────────────────────────────────────────────────────
-def load_calibration_history(assignment_id: str) -> list[dict[str, Any]]:
-    """Seeded fixtures + any TA-approved records for this assignment, newest first."""
-    records: list[dict[str, Any]] = []
-    seed_dir = FIXTURES / "calibration-history"
-    if seed_dir.exists():
-        for p in sorted(seed_dir.glob("*.json")):
-            rec = json.loads(p.read_text(encoding="utf-8"))
-            if rec.get("assignment_id") == assignment_id:
-                records.append(rec)
-    if CALIBRATION.exists():
-        for p in sorted(CALIBRATION.glob("*.json")):
-            rec = json.loads(p.read_text(encoding="utf-8"))
-            if rec.get("assignment_id") == assignment_id:
-                records.append(rec)
-    records.sort(key=lambda r: r.get("approved_at", ""), reverse=True)
+        full = get_submission(wid, s["id"]) or {}
+        records.append({
+            "scores": full.get("scores", {}),
+            "total": full.get("total"),
+            "misconception_labels": full.get("misconception_labels", []),
+        })
     return records
 
 
 def summarize_calibration(records: list[dict[str, Any]]) -> dict[str, Any]:
-    """Turn prior approved reviews into TA-facing tendencies. Deterministic —
-    no model call. Never changes rubric weights or frozen tests; it only
-    annotates what the TA has historically done."""
     n = len(records)
     if n == 0:
-        return {"count": 0, "tendencies": [], "misconception_counts": {}}
-
-    # Average score per criterion across records that recorded it.
+        return {"count": 0, "tendencies": [], "criterion_averages": {}}
     crit_totals: dict[str, list[int]] = {}
     for rec in records:
         for cid, val in (rec.get("scores") or {}).items():
             crit_totals.setdefault(cid, []).append(val)
     crit_avg = {cid: round(sum(v) / len(v), 2) for cid, v in crit_totals.items()}
-
-    misconception_counts: dict[str, int] = {}
+    misc: dict[str, int] = {}
     for rec in records:
         for label in rec.get("misconception_labels") or []:
-            misconception_counts[label] = misconception_counts.get(label, 0) + 1
-
-    tendencies: list[str] = []
-    clean = [r for r in records if not r.get("misconception_labels")]
+            misc[label] = misc.get(label, 0) + 1
+    tendencies = [f"Based on {n} mark(s) you've approved for this assignment."]
+    clean = sum(1 for r in records if not r.get("misconception_labels"))
     if clean:
-        tendencies.append(
-            f"On {len(clean)} clean BFS submissions the TA awarded full "
-            f"algorithmic-understanding marks when a queue + visited set were present."
-        )
-    if misconception_counts.get("dfs_instead_of_bfs"):
-        c = misconception_counts["dfs_instead_of_bfs"]
-        tendencies.append(
-            f"On {c} prior submission(s) flagged as DFS-instead-of-BFS, the TA "
-            f"reduced correctness and algorithmic understanding and added a concise "
-            f"misconception note."
-        )
-    styles = [r.get("feedback_style") for r in records if r.get("feedback_style")]
-    if styles:
-        common = max(set(styles), key=styles.count)
-        tendencies.append(f"Preferred feedback style across prior reviews: {common}.")
-
-    return {
-        "count": n,
-        "criterion_averages": crit_avg,
-        "misconception_counts": misconception_counts,
-        "tendencies": tendencies,
-    }
-
-
-def save_calibration_record(record: dict[str, Any]) -> dict[str, Any]:
-    _ensure_dirs()
-    rid = record.get("record_id") or f"rec-{int(time.time())}"
-    record["record_id"] = rid
-    record["approved_at"] = record.get("approved_at") or _now()
-    (CALIBRATION / f"{rid}.json").write_text(
-        json.dumps(record, indent=2), encoding="utf-8"
-    )
-    return record
-
-
-def reset_calibration() -> int:
-    """Delete TA-approved calibration records (seeded fixtures are untouched)."""
-    if not CALIBRATION.exists():
-        return 0
-    n = 0
-    for p in CALIBRATION.glob("*.json"):
-        p.unlink()
-        n += 1
-    return n
-
-
-# ── final feedback archive ──────────────────────────────────────────────────────
-def save_feedback(record: dict[str, Any]) -> dict[str, Any]:
-    _ensure_dirs()
-    fid = record.get("feedback_id") or f"fb-{int(time.time())}"
-    record["feedback_id"] = fid
-    record["saved_at"] = record.get("saved_at") or _now()
-    path = FEEDBACK / f"{fid}.json"
-    path.write_text(json.dumps(record, indent=2), encoding="utf-8")
-    record["saved_path"] = str(path)
-    return record
-
-
-def _now() -> str:
-    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        tendencies.append(f"{clean} submission(s) passed every check and received high marks.")
+    if misc:
+        top = max(misc, key=misc.get)
+        tendencies.append(f"Most common issue so far: {top.replace('_', ' ')} ({misc[top]}×).")
+    return {"count": n, "criterion_averages": crit_avg, "tendencies": tendencies,
+            "misconception_counts": misc}

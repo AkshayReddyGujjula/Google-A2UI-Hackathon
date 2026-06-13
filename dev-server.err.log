@@ -1,0 +1,1 @@
+$ concurrently "pnpm dev:ui" "pnpm dev:agent" --names ui,agent --prefix-colors blue,green --kill-others

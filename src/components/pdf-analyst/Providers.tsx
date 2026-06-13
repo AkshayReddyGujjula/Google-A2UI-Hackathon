@@ -8,7 +8,6 @@ import { createMirrorActivityRenderer } from "@/a2ui/MirrorRenderer";
  * SurfaceCanvas, so the marking cockpit renders at full canvas size instead of
  * as a chat bubble. The pill left in chat is the "surface → rendered" handoff. */
 const RENDERERS = [
-  createMirrorActivityRenderer("setup_agent"),
   createMirrorActivityRenderer("review_agent"),
   createMirrorActivityRenderer("default"),
 ];

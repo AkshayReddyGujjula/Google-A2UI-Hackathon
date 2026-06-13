@@ -1,0 +1,90 @@
+aksha@AkiLaptop MINGW64 ~/Desktop/Hackathons/Google-A2UI Hackathon/Google-A2UI-Hackathon (main)
+$ cmd.exe /c taskkill /PID 34088 /F
+Microsoft Windows [Version 10.0.26200.8655]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon>rm -f .next/dev/lock
+
+C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon>pnpm dev
+Already up to date
+Done in 724ms using pnpm v11.6.0
+$ concurrently "pnpm dev:ui" "pnpm dev:agent" --names ui,agent --prefix-colors blue,green --kill-others
+[ui] $ next dev --turbopack
+[agent] $ node scripts/run-agent.mjs
+[agent] INFO:     Will watch for changes in these directories: ['C:\\Users\\aksha\\Desktop\\Hackathons\\Google-A2UI Hackathon\\Google-A2UI-Hackathon\\agent']
+[ui] ⚠ Port 3000 is in use by process 34088, using available port 3001 instead.
+[ui] ▲ Next.js 16.1.6 (Turbopack)
+[ui] - Local:         http://localhost:3001
+[ui] - Network:       http://172.16.0.2:3001
+[ui] - Environments: .env
+[ui]
+[ui] ✓ Starting...
+[ui] ✓ Ready in 2.4s
+[agent] INFO:     Uvicorn running on http://127.0.0.1:8123 (Press CTRL+C to quit)
+[agent] INFO:     Started reloader process [41060] using StatReload
+[agent] INFO:     Started server process [27768]
+[agent] INFO:     Waiting for application startup.
+[agent] INFO:     Application startup complete.
+[ui]
+[ui] thread 'tokio-runtime-worker' (30324) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for <DiskFileSystem as FileSystem>::read (TaskId 51952))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 51952 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000305.meta
+[ui]     2: Unable to open static sorted file 00000301.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui] note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+[ui]
+[ui] -----
+[ui] FATAL: An unexpected Turbopack error occurred. A panic log has been written to C:\Users\aksha\AppData\Local\Temp\next-panic-e9cd15cd2fe16af1300fa23a32b63da5.log.
+[ui]
+[ui] To help make Turbopack better, report this error by clicking here.
+[ui] -----
+[ui]
+[ui]
+[ui] thread 'tokio-runtime-worker' (36364) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for Project::execution_context (TaskId 389))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 389 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000305.meta
+[ui]     2: Unable to open static sorted file 00000301.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui]
+[ui] thread 'tokio-runtime-worker' (30324) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for FileSystem::root (TaskId 13))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 13 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000305.meta
+[ui]     2: Unable to open static sorted file 00000301.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui]
+[ui] thread 'tokio-runtime-worker' (22028) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for Project::execution_context (TaskId 389))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 389 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000305.meta
+[ui]     2: Unable to open static sorted file 00000301.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui]
+[ui] thread 'tokio-runtime-worker' (30324) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for FileSystem::root (TaskId 13))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 13 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000305.meta
+[ui]     2: Unable to open static sorted file 00000301.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui]
+[ui] thread 'tokio-runtime-worker' (13616) panicked at C:\actions-runner\_work\next.js\next.js\turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:156:17:
+[ui] Failed to restore task data (corrupted database or bug): Meta for item_code_and_ids (TaskId 51643))
+[ui]
+[ui] Caused by:
+[ui]     0: Looking up data for TaskId 51643 from database failed
+[ui]     1: Unable to open static sorted file referenced from 00000226.meta
+[ui]     2: Unable to open static sorted file 00000220.sst
+[ui]     3: The system cannot find the file specified. (os error 2)
+[ui] ○ Compiling /_error ...

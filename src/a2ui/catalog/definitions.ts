@@ -349,6 +349,9 @@ export const definitions = {
     description:
       "SVG visualisation of a graph: nodes positioned by BFS layer, the expected shortest path, and the student's actual returned path overlaid, so a non-minimal (DFS) path is visible at a glance.",
     props: z.object({
+      caseName: z.string().optional(),
+      caseStatus: z.string().optional(),
+      caseMessage: z.string().optional(),
       nodes: z.array(
         z.object({
           id: z.string(),
@@ -366,6 +369,32 @@ export const definitions = {
       studentEdges: z.number().nullable().optional(),
       isMinimal: z.boolean().nullable().optional(),
       studentError: z.string().nullable().optional(),
+      traces: z
+        .array(
+          z.object({
+            caseName: z.string().optional(),
+            caseStatus: z.string().optional(),
+            caseMessage: z.string().optional(),
+            nodes: z.array(
+              z.object({
+                id: z.string(),
+                x: z.number(),
+                y: z.number(),
+                layer: z.number().nullable().optional(),
+              }),
+            ),
+            edges: z.array(z.object({ from: z.string(), to: z.string() })),
+            start: z.string().optional(),
+            goal: z.string().optional(),
+            expectedPath: z.array(z.string()).nullable().optional(),
+            studentPath: z.array(z.string()).nullable().optional(),
+            expectedEdges: z.number().nullable().optional(),
+            studentEdges: z.number().nullable().optional(),
+            isMinimal: z.boolean().nullable().optional(),
+            studentError: z.string().nullable().optional(),
+          }),
+        )
+        .optional(),
     }),
   },
 
@@ -385,6 +414,22 @@ export const definitions = {
       total: z.number().optional(),
       maxTotal: z.number().optional(),
       showFailedTestsDefault: z.boolean().optional(),
+    }),
+  },
+
+  CaseComparisonPanel: {
+    description:
+      "General per-case comparison for any assignment: for each test input, the expected output (from the reference solution) vs the student's actual output, with pass/fail. The adaptive evidence panel shown for every assignment type.",
+    props: z.object({
+      cases: z.array(
+        z.object({
+          name: z.string(),
+          status: z.string(),
+          input: z.string(),
+          expected: z.string(),
+          actual: z.string(),
+        }),
+      ),
     }),
   },
 };

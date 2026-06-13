@@ -1,10 +1,10 @@
-"""Evidence-based analysis: misconception detection, score proposal, feedback.
+"""Evidence-based, assignment-agnostic analysis.
 
-Design principle: the *decisions that carry marks* are deterministic and derived
-from real test results + simple, auditable code signals — never invented by a
-model. Gemini is used only to polish prose (misconception explanation, feedback
-letter) on top of those facts, and there is always a templated fallback so the
-pipeline runs with no API key (OFFLINE=1).
+Marks-bearing decisions come from REAL differential test results (which cases the
+student passed/failed) mapped onto the rubric by each criterion's `kind`. Gemini
+is used only to (a) explain, in plain language, the conceptual error behind the
+failing cases and (b) polish the feedback letter — never to decide a score. Both
+have deterministic fallbacks so a transient model error can't break marking.
 """
 from __future__ import annotations
 
@@ -12,202 +12,169 @@ import os
 import re
 from typing import Any
 
-# ── code signals (auditable heuristics) ─────────────────────────────────────────
+
+# ── code signals (cheap, auditable) ───────────────────────────────────────────────
 def code_signals(code: str) -> dict[str, bool]:
-    c = code.lower()
     return {
-        "uses_queue": bool(re.search(r"deque|queue|popleft|fifo", c)),
-        "uses_visited": "visited" in c or "seen" in c,
-        "is_recursive": bool(re.search(r"def\s+\w+.*:\s*[\s\S]*?\breturn\b", c)) and _has_self_recursion(code),
-        "dfs_naming": bool(re.search(r"\bdfs\b|explore|backtrack|depth.first", c)),
-        "has_debug_print": bool(re.search(r"^\s*print\(", code, re.MULTILINE)),
+        "has_debug_print": bool(re.search(r"^\s*print\(", code or "", re.MULTILINE)),
+        "very_long": len((code or "").splitlines()) > 120,
     }
 
 
-def _has_self_recursion(code: str) -> bool:
-    m = re.findall(r"def\s+(\w+)\s*\(", code)
-    for name in m:
-        # a call to the function inside the body (excluding the def line)
-        body = re.sub(rf"def\s+{name}\s*\([^)]*\)\s*:", "", code)
-        if re.search(rf"\b{name}\s*\(", body):
-            return True
-    return False
+def _rates(cases: list[dict[str, Any]]) -> dict[str, Any]:
+    total = len(cases)
+    passed = sum(1 for c in cases if c.get("status") == "passed")
+    corr = [c for c in cases if c.get("kind") != "edge_case"]
+    edge = [c for c in cases if c.get("kind") == "edge_case"]
 
+    def rate(group: list[dict[str, Any]]) -> float:
+        return (sum(1 for c in group if c.get("status") == "passed") / len(group)) if group else 1.0
 
-def _failed(tests: list[dict], *needles: str) -> bool:
-    return any(t["status"] != "passed" and any(n in t["name"] for n in needles) for t in tests)
-
-
-def _passed(tests: list[dict], *needles: str) -> bool:
-    rel = [t for t in tests if any(n in t["name"] for n in needles)]
-    return bool(rel) and all(t["status"] == "passed" for t in rel)
-
-
-# ── misconception detection ──────────────────────────────────────────────────────
-def detect_misconception(test_results: dict, code: str) -> dict[str, Any]:
-    tests = test_results.get("tests", [])
-    sig = code_signals(code)
-
-    if test_results.get("timed_out"):
-        return {
-            "detected": True,
-            "label": "missing_visited_set",
-            "title": "Possible infinite loop (no visited set)",
-            "severity": "high",
-            "evidence": ["Execution exceeded the time limit on a cyclic graph — typically a missing visited/seen set."],
-        }
-
-    minimal_failed = _failed(tests, "minimal")
-    endpoints_ok = _passed(tests, "endpoints", "edges_exist")
-    if minimal_failed and endpoints_ok:
-        ev = []
-        for t in tests:
-            if "minimal" in t["name"] and t["status"] != "passed":
-                ev.append(t["message"] or "Returned a valid path that is not the shortest.")
-        if sig["is_recursive"] or sig["dfs_naming"] or not sig["uses_queue"]:
-            ev.append("Code uses a recursive depth-first traversal (no FIFO queue), so it returns the first path found rather than the shortest.")
-        return {
-            "detected": True,
-            "label": "dfs_instead_of_bfs",
-            "title": "Depth-first traversal instead of breadth-first search",
-            "severity": "high",
-            "explanation": (
-                "The submission explores one branch to its end before trying others (depth-first), "
-                "so it returns a valid but non-shortest path. BFS explores the graph layer by layer "
-                "with a FIFO queue, guaranteeing the fewest edges to the goal in an unweighted graph."
-            ),
-            "evidence": ev,
-        }
-
-    if _failed(tests, "unreachable"):
-        return {
-            "detected": True,
-            "label": "missing_unreachable_case",
-            "title": "Unreachable goal not handled",
-            "severity": "medium",
-            "evidence": ["The function does not return None when the goal cannot be reached."],
-        }
-
-    if test_results.get("summary", {}).get("failed", 0) == 0:
-        return {"detected": False, "label": None, "title": "No misconception detected", "severity": "none", "evidence": []}
-
-    # Generic fallback
-    failed_names = [t["name"] for t in tests if t["status"] != "passed"]
     return {
-        "detected": True,
-        "label": "failing_tests",
-        "title": "Some frozen tests fail",
-        "severity": "medium",
-        "evidence": [f"Failing: {', '.join(failed_names)}"],
+        "total": total, "passed": passed,
+        "overall": (passed / total) if total else 1.0,
+        "correctness": rate(corr), "correctness_n": len(corr),
+        "correctness_pass": sum(1 for c in corr if c.get("status") == "passed"),
+        "edge": rate(edge), "edge_n": len(edge),
+        "edge_pass": sum(1 for c in edge if c.get("status") == "passed"),
     }
 
 
-# ── score proposal (deterministic, clamped to rubric maxima) ─────────────────────
-def propose_scores(rubric: dict, test_results: dict, misconception: dict, code: str) -> list[dict[str, Any]]:
-    tests = test_results.get("tests", [])
+# ── score proposal (rubric-driven by criterion kind) ──────────────────────────────
+def propose_scores(rubric: dict[str, Any], diff: dict[str, Any], code: str,
+                   misconception: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    cases = diff.get("cases", [])
+    r = _rates(cases)
     sig = code_signals(code)
-    minimal_failed = _failed(tests, "minimal")
-    label = misconception.get("label")
-
+    high_misconception = bool(misconception and misconception.get("detected")
+                              and misconception.get("severity") == "high")
     out: list[dict[str, Any]] = []
     for crit in rubric.get("criteria", []):
-        cid, mx = crit["id"], crit["max"]
-        score, rationale = mx, ""
-
-        if cid == "correctness":
-            rel = [t for t in tests if any(n in t["name"] for n in ("minimal", "endpoints", "edges", "valid_shortest"))]
-            frac = (sum(1 for t in rel if t["status"] == "passed") / len(rel)) if rel else 1.0
-            score = round(mx * frac)
-            if minimal_failed:  # shortest-path is the core requirement — cap it
+        mx = int(crit.get("max", 0))
+        kind = crit.get("kind", "correctness")
+        if kind == "correctness":
+            score = round(mx * r["correctness"])
+            rationale = f"{r['correctness_pass']}/{r['correctness_n']} correctness cases pass."
+        elif kind == "edge_cases":
+            score = round(mx * r["edge"])
+            rationale = (f"{r['edge_pass']}/{r['edge_n']} edge cases pass."
+                         if r["edge_n"] else "No edge cases failed.")
+        elif kind == "algorithmic_understanding":
+            score = round(mx * r["overall"])
+            if high_misconception:
                 score = min(score, mx // 2)
-                rationale = "Returns a valid path but not the shortest (minimal-edge) one — the core requirement."
-            else:
-                rationale = f"{sum(1 for t in rel if t['status']=='passed')}/{len(rel)} correctness tests pass."
-
-        elif cid == "algorithmic_understanding":
-            if label == "dfs_instead_of_bfs":
-                score, rationale = max(1, mx // 3), "Depth-first recursion rather than a level-order BFS queue."
-            elif sig["uses_queue"] and sig["uses_visited"]:
-                score, rationale = mx, "Uses a FIFO queue + visited set — a correct breadth-first strategy."
-            else:
-                score, rationale = max(1, mx - 1), "BFS structures (queue/visited) not clearly present."
-
-        elif cid == "edge_cases":
-            ok = _passed(tests, "start_equals_goal") and not _failed(tests, "unreachable", "cycle")
-            score = mx if ok else 0
-            rationale = "Handles start==goal, unreachable, and cyclic graphs." if ok else "One or more edge cases fail."
-
-        elif cid == "code_quality":
-            if sig["has_debug_print"]:
-                score, rationale = max(0, mx - 1), "Leftover debug print statements."
-            else:
-                score, rationale = mx, "Readable and reasonably structured."
+            rationale = (f"Behaviour matches the expected approach on {r['passed']}/{r['total']} cases."
+                         + (" Approach diverges on key cases." if high_misconception else ""))
+        elif kind == "code_quality":
+            score = mx - (1 if sig["has_debug_print"] else 0)
+            rationale = "Leftover debug prints." if sig["has_debug_print"] else "Readable and reasonably structured."
         else:
-            # Unknown criterion: scale by overall pass rate.
-            s = test_results.get("summary", {})
-            frac = (s.get("passed", 0) / s.get("total", 1)) if s.get("total") else 1.0
-            score, rationale = round(mx * frac), f"{s.get('passed',0)}/{s.get('total',0)} tests pass."
-
-        out.append({"id": cid, "label": crit["label"], "max": mx, "proposed": max(0, min(mx, score)), "rationale": rationale})
+            score = round(mx * r["overall"])
+            rationale = f"{r['passed']}/{r['total']} cases pass."
+        out.append({
+            "id": crit.get("id", kind), "label": crit.get("label", kind), "kind": kind,
+            "max": mx, "proposed": max(0, min(mx, score)), "rationale": rationale,
+        })
     return out
 
 
-# ── feedback letter (templated; Gemini-polished when available) ──────────────────
-def build_feedback(rubric: dict, scorecard: list[dict], misconception: dict, reference: dict | None,
-                   include_resource: bool, total: int, max_total: int) -> dict[str, Any]:
-    passed_pts = ", ".join(c["label"] for c in scorecard if c["proposed"] == c["max"])
-    paras: list[str] = []
-    paras.append(
-        f"Thanks for your submission to “{rubric.get('title','this assignment')}”. "
-        f"Overall you scored {total} out of {max_total}."
-    )
-    if passed_pts:
-        paras.append(f"What you did well: full marks on {passed_pts}.")
+# ── misconception (general; LLM-explained, deterministic fallback) ─────────────────
+def detect_misconception(diff: dict[str, Any], code: str, spec: dict[str, Any]) -> dict[str, Any]:
+    cases = diff.get("cases", [])
+    failing = [c for c in cases if c.get("status") != "passed"]
+    if diff.get("fatal"):
+        return {"detected": True, "label": "did_not_run", "title": "Submission did not run",
+                "severity": "high", "explanation": diff["fatal"][:300],
+                "evidence": [diff["fatal"][:200]]}
+    if not failing:
+        return {"detected": False, "label": None, "title": "No issues detected",
+                "severity": "none", "explanation": "", "evidence": []}
+    if diff.get("timed_out"):
+        return {"detected": True, "label": "infinite_loop",
+                "title": "Possible infinite loop / non-termination", "severity": "high",
+                "explanation": "The submission did not terminate within the time limit on at least one input "
+                               "— often a missing visited/seen set or a loop that never advances.",
+                "evidence": [c["message"] for c in failing if c.get("message")][:3]}
+    evidence = [f"{c['name']}: {c.get('message', 'failed')}" for c in failing][:4]
+    base = {"detected": True, "label": "logic_error",
+            "title": f"Incorrect on {len(failing)} of {len(cases)} cases",
+            "severity": "high" if len(failing) > len(cases) / 2 else "medium",
+            "explanation": "", "evidence": evidence}
+    explained = _explain_failures(spec, failing, code)
+    if explained:
+        base.update(explained)
+    else:
+        base["explanation"] = ("The submission's output differs from the expected result on the cases above. "
+                               "Compare the expected vs actual values to see where the logic diverges.")
+    return base
+
+
+def _explain_failures(spec: dict[str, Any], failing: list[dict[str, Any]], code: str) -> dict[str, Any] | None:
+    if not os.getenv("GEMINI_API_KEY"):
+        return None
+    try:
+        from langchain_core.messages import HumanMessage, SystemMessage
+        from . import model
+
+        cases_txt = "\n".join(
+            f"- input={c.get('input')}, expected={c.get('expected')}, got={c.get('actual')}"
+            for c in failing[:5]
+        )
+        sys_p = ("You are a CS teaching assistant. Given a coding task, a student's code, and the "
+                 "specific failing cases (input/expected/actual), explain the ROOT conceptual mistake "
+                 "in 2-3 sentences, plainly, for the student. Return STRICT JSON: "
+                 '{"title": "<=6 word label", "explanation": "2-3 sentences"}. No prose outside JSON.')
+        usr = (f"Task: {spec.get('title')} ({spec.get('assignment_type')})\n"
+               f"Function: {spec.get('signature')}\n\nStudent code:\n{code[:2500]}\n\nFailing cases:\n{cases_txt}")
+        m = model.build_chat_model(temperature=0.2)
+        resp = m.invoke([SystemMessage(content=sys_p), HumanMessage(content=usr)])
+        text = model.text_of(resp)
+        import json
+        a, b = text.find("{"), text.rfind("}")
+        obj = json.loads(text[a:b + 1])
+        return {"title": obj.get("title") or "Logic error", "explanation": obj.get("explanation", "")}
+    except Exception:  # noqa: BLE001
+        return None
+
+
+# ── feedback letter (templated; Gemini-polished when available) ────────────────────
+def build_feedback(spec: dict[str, Any], scorecard: list[dict[str, Any]], misconception: dict[str, Any],
+                   reference: dict[str, Any] | None, include_resource: bool,
+                   total: int, max_total: int) -> dict[str, Any]:
+    strong = ", ".join(c["label"] for c in scorecard if c["proposed"] == c["max"])
+    paras: list[str] = [
+        f"Thanks for your submission to “{spec.get('title', 'this assignment')}”. "
+        f"You scored {total} out of {max_total}."
+    ]
+    if strong:
+        paras.append(f"What you did well: full marks on {strong}.")
     if misconception.get("detected"):
-        if misconception["label"] == "dfs_instead_of_bfs":
-            paras.append(
-                "The main issue is the traversal strategy. Your code finds a valid path, but it explores "
-                "one branch all the way down before trying others (depth-first), so it can return a path "
-                "that is longer than necessary. Breadth-first search explores the graph layer by layer using "
-                "a FIFO queue and a visited set, so the first time it reaches the goal it has used the fewest "
-                "possible edges — the shortest path in an unweighted graph."
-            )
-        else:
-            paras.append(f"Area to revisit: {misconception.get('title','')}. " + " ".join(misconception.get("evidence", [])[:1]))
+        paras.append(f"Main thing to revisit: {misconception.get('title', '')}. "
+                     + (misconception.get("explanation") or ""))
+    else:
+        paras.append("Your solution passed every check — nicely done.")
     if include_resource and reference and reference.get("sources"):
-        src = reference["sources"][0]
-        paras.append(f"Optional reading: {src.get('name','reference')} — {src.get('url','')}")
-
-    plain = "\n\n".join(paras)
-    return {
-        "greeting": "Feedback on your submission",
-        "letter_paragraphs": _maybe_polish(paras),
-        "plain_text": plain,
-    }
+        s = reference["sources"][0]
+        paras.append(f"Optional reading: {s.get('name', 'reference')} — {s.get('url', '')}")
+    plain = "\n\n".join(p.strip() for p in paras if p.strip())
+    return {"greeting": "Feedback on your submission",
+            "letter_paragraphs": _maybe_polish(paras), "plain_text": plain}
 
 
-# ── optional Gemini prose polish ─────────────────────────────────────────────────
 def _maybe_polish(paragraphs: list[str]) -> list[str]:
-    """Hook for LLM polish. Kept conservative: only runs online and never
-    invents facts (it rewrites the given paragraphs). Falls back to the input
-    on any error so the pipeline is deterministic without a key."""
-    if os.getenv("OFFLINE") == "1" or not os.getenv("GEMINI_API_KEY"):
+    if not os.getenv("GEMINI_API_KEY"):
         return paragraphs
     try:
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        from langchain_core.messages import SystemMessage, HumanMessage
+        from langchain_core.messages import HumanMessage, SystemMessage
+        from . import model
 
-        model = ChatGoogleGenerativeAI(model=os.getenv("MODEL", "gemini-3.5-flash"),
-                                       google_api_key=os.getenv("GEMINI_API_KEY"), temperature=0.3)
-        prompt = (
-            "Rewrite the following student feedback so it is warm, concise, and encouraging. "
-            "Do NOT change any facts, scores, or the technical explanation. Keep it to the same "
-            "number of short paragraphs. Return the paragraphs separated by a blank line.\n\n"
-            + "\n\n".join(paragraphs)
-        )
-        resp = model.invoke([SystemMessage(content="You are a supportive CS teaching assistant."),
-                             HumanMessage(content=prompt)])
-        text = resp.content if isinstance(resp.content, str) else str(resp.content)
+        m = model.build_chat_model(temperature=0.3)
+        prompt = ("Rewrite this student feedback to be warm, concise, and encouraging. Do NOT change "
+                  "any facts, scores, or the technical explanation. Keep the same number of short "
+                  "paragraphs, separated by a blank line.\n\n" + "\n\n".join(paragraphs))
+        resp = m.invoke([SystemMessage(content="You are a supportive CS teaching assistant."),
+                         HumanMessage(content=prompt)])
+        text = model.text_of(resp)
         out = [p.strip() for p in text.split("\n\n") if p.strip()]
         return out or paragraphs
     except Exception:  # noqa: BLE001

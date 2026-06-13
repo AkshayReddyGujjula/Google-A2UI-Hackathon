@@ -1,0 +1,365 @@
+Already up to date
+Done in 529ms using pnpm v11.6.0
+[agent] $ node scripts/run-agent.mjs
+[ui] $ next dev --turbopack
+[agent] INFO:     Will watch for changes in these directories: ['C:\\Users\\aksha\\Desktop\\Hackathons\\Google-A2UI Hackathon\\Google-A2UI-Hackathon\\agent']
+[ui] ▲ Next.js 16.1.6 (Turbopack)
+[ui] - Local:         http://localhost:3000
+[ui] - Network:       http://172.16.0.2:3000
+[ui] - Environments: .env
+[ui] 
+[ui] ✓ Starting...
+[ui] ✓ Ready in 1720ms
+[agent] INFO:     Uvicorn running on http://127.0.0.1:8123 (Press CTRL+C to quit)
+[agent] INFO:     Started reloader process [36664] using StatReload
+[agent] INFO:     Started server process [30268]
+[agent] INFO:     Waiting for application startup.
+[agent] INFO:     Application startup complete.
+[agent] INFO:     127.0.0.1:50193 - "GET / HTTP/1.1" 200 OK
+[ui] ○ Compiling / ...
+[ui]  GET / 200 in 32.3s (compile: 31.1s, render: 1243ms)
+[ui]  GET / 200 in 12.5s (compile: 11.3s, render: 1148ms)
+[agent] INFO:     127.0.0.1:57659 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57659 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] [CopilotKit Runtime] anonymous telemetry enabled — see https://docs.copilotkit.ai/telemetry to opt out (set COPILOTKIT_TELEMETRY_DISABLED=true).
+[ui]  POST /api/copilotkit-agents 200 in 10.9s (compile: 10.8s, render: 59ms)
+[ui]  POST /api/copilotkit-agents 200 in 33ms (compile: 7ms, render: 26ms)
+[agent] INFO:     127.0.0.1:51776 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:51776 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 1486ms (compile: 1134ms, render: 352ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 1481ms (compile: 1238ms, render: 243ms)
+[agent] INFO:     127.0.0.1:56462 - "POST /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56462 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] ○ Compiling /a/[id] ...
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 11.8s (compile: 11.5s, render: 286ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 175ms (compile: 49ms, render: 126ms)
+[agent] INFO:     127.0.0.1:61204 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62988 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57882 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50331 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55353 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57882 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50331 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55353 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57882 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62988 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63130 - "PATCH /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63130 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/freeze HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63130 - "POST /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/freeze HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:58595 - "POST /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui] ○ Compiling /a/[id]/s/[sid] ...
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa/s/sub-72326fea 200 in 14.6s (compile: 14.4s, render: 203ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56986 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50459 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56986 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py:49: UserWarning: install_httpx_hook: client of type Client has no recognized event_hooks attribute; x-* headers will not be forwarded
+[agent]   install_httpx_hook(client)
+[agent] C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py:49: UserWarning: install_httpx_hook: client of type AsyncClient has no recognized event_hooks attribute; x-* headers will not be forwarded
+[agent]   install_httpx_hook(client)
+[agent] INFO:     127.0.0.1:50459 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui] Error running agent: Error: Thread already running
+[ui]     at ignore-listed frames
+[ui] Error stack: Error: Thread already running
+[ui]     at InMemoryAgentRunner.run (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/runner/in-memory.mjs:30:30)
+[ui]     at observableFactory (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:12:43)
+[ui]     at file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:35:28
+[ui]     at createSseEventResponse (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:91:4)
+[ui]     at handleSseRun (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:6:9)
+[ui]     at handleRunAgent (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/handle-run.mjs:43:10)
+[ui]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ui]     at async file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/core/fetch-handler.mjs:68:16
+[ui]     at async AppRouteRouteModule.do (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+[ui]     at async AppRouteRouteModule.handle (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+[ui]     at async responseGenerator (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9763:38)
+[ui]     at async AppRouteRouteModule.handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:191938)
+[ui]     at async handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9826:32)
+[ui]     at async Module.handler (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9879:13)
+[ui]     at async DevServer.renderToResponseWithComponentsImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1442:9)
+[ui]     at async DevServer.renderPageComponent (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1494:24)
+[ui]     at async DevServer.renderToResponseImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1544:32)
+[ui]     at async DevServer.pipeImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1038:25)
+[ui]     at async NextNodeServer.handleCatchallRenderRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\next-server.js:395:17)
+[ui]     at async DevServer.handleRequestImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:929:17)
+[ui]     at async C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+[ui]     at async Span.traceAsyncFn (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\trace\trace.js:157:20)
+[ui]     at async DevServer.handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+[ui]     at async invokeRender (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:248:21)
+[ui]     at async handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:447:24)
+[ui]     at async requestHandlerImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:496:13)
+[ui]     at async Server.requestListener (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\start-server.js:226:13)
+[ui] Error details: { name: 'Error', message: 'Thread already running', cause: undefined }
+[ui]  POST /api/copilotkit-agents 200 in 351ms (compile: 17ms, render: 334ms)
+[ui]  POST /api/copilotkit-agents 200 in 3.8s (compile: 25ms, render: 3.7s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 83ms (compile: 10ms, render: 73ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 9.2s (compile: 12ms, render: 9.2s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 68ms (compile: 13ms, render: 55ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 54ms (compile: 25ms, render: 29ms)
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:49938 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa/s/sub-72326fea 200 in 51ms (compile: 22ms, render: 29ms)
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:49938 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] Error running agent: Error: Thread already running
+[ui]     at ignore-listed frames
+[ui] Error stack: Error: Thread already running
+[ui]     at InMemoryAgentRunner.run (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/runner/in-memory.mjs:30:30)
+[ui]     at observableFactory (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:12:43)
+[ui]     at file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:35:28
+[ui]     at createSseEventResponse (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:91:4)
+[ui]     at handleSseRun (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:6:9)
+[ui]     at handleRunAgent (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/handle-run.mjs:43:10)
+[ui]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ui]     at async file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/core/fetch-handler.mjs:68:16
+[ui]     at async AppRouteRouteModule.do (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+[ui]     at async AppRouteRouteModule.handle (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+[ui]     at async responseGenerator (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9763:38)
+[ui]     at async AppRouteRouteModule.handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:191938)
+[ui]     at async handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9826:32)
+[ui]     at async Module.handler (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9879:13)
+[ui]     at async DevServer.renderToResponseWithComponentsImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1442:9)
+[ui]     at async DevServer.renderPageComponent (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1494:24)
+[ui]     at async DevServer.renderToResponseImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1544:32)
+[ui]     at async DevServer.pipeImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1038:25)
+[ui]     at async NextNodeServer.handleCatchallRenderRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\next-server.js:395:17)
+[ui]     at async DevServer.handleRequestImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:929:17)
+[ui]     at async C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+[ui]     at async Span.traceAsyncFn (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\trace\trace.js:157:20)
+[ui]     at async DevServer.handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+[ui]     at async invokeRender (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:248:21)
+[ui]     at async handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:447:24)
+[ui]     at async requestHandlerImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:496:13)
+[ui]     at async Server.requestListener (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\start-server.js:226:13)
+[ui] Error details: { name: 'Error', message: 'Thread already running', cause: undefined }
+[ui]  POST /api/copilotkit-agents 200 in 174ms (compile: 4ms, render: 171ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 74ms (compile: 55ms, render: 20ms)
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:49938 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:53128 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:52335 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:53128 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 3.8s (compile: 9ms, render: 3.8s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 59ms (compile: 10ms, render: 50ms)
+[agent] INFO:     127.0.0.1:54508 - "POST /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa/s/sub-0dadac3c 200 in 50ms (compile: 28ms, render: 22ms)
+[agent] INFO:     127.0.0.1:54508 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:54508 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:54508 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:54508 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] Error running agent: Error: Thread already running
+[ui]     at ignore-listed frames
+[ui] Error stack: Error: Thread already running
+[ui]     at InMemoryAgentRunner.run (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/runner/in-memory.mjs:30:30)
+[ui]     at observableFactory (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:12:43)
+[ui]     at file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:35:28
+[ui]     at createSseEventResponse (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:91:4)
+[ui]     at handleSseRun (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:6:9)
+[ui]     at handleRunAgent (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/handle-run.mjs:43:10)
+[ui]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ui]     at async file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/core/fetch-handler.mjs:68:16
+[ui]     at async AppRouteRouteModule.do (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+[ui]     at async AppRouteRouteModule.handle (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+[ui]     at async responseGenerator (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9763:38)
+[ui]     at async AppRouteRouteModule.handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:191938)
+[ui]     at async handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9826:32)
+[ui]     at async Module.handler (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9879:13)
+[ui]     at async DevServer.renderToResponseWithComponentsImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1442:9)
+[ui]     at async DevServer.renderPageComponent (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1494:24)
+[ui]     at async DevServer.renderToResponseImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1544:32)
+[ui]     at async DevServer.pipeImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1038:25)
+[ui]     at async NextNodeServer.handleCatchallRenderRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\next-server.js:395:17)
+[ui]     at async DevServer.handleRequestImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:929:17)
+[ui]     at async C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+[ui]     at async Span.traceAsyncFn (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\trace\trace.js:157:20)
+[ui]     at async DevServer.handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+[ui]     at async invokeRender (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:248:21)
+[ui]     at async handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:447:24)
+[ui]     at async requestHandlerImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:496:13)
+[ui]     at async Server.requestListener (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\start-server.js:226:13)
+[ui] Error details: { name: 'Error', message: 'Thread already running', cause: undefined }
+[ui]  POST /api/copilotkit-agents 200 in 183ms (compile: 23ms, render: 160ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 7.5s (compile: 11ms, render: 7.5s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 57ms (compile: 8ms, render: 49ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 54ms (compile: 20ms, render: 34ms)
+[agent] INFO:     127.0.0.1:56088 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56088 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:51846 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56088 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62260 - "POST /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa/s/sub-efa7ff9c 200 in 65ms (compile: 36ms, render: 29ms)
+[agent] INFO:     127.0.0.1:62260 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62569 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62260 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62260 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:62569 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] Error running agent: Error: Thread already running
+[ui]     at ignore-listed frames
+[ui] Error stack: Error: Thread already running
+[ui]     at InMemoryAgentRunner.run (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/runner/in-memory.mjs:30:30)
+[ui]     at observableFactory (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:12:43)
+[ui]     at file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:35:28
+[ui]     at createSseEventResponse (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:91:4)
+[ui]     at handleSseRun (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:6:9)
+[ui]     at handleRunAgent (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/handle-run.mjs:43:10)
+[ui]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ui]     at async file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/core/fetch-handler.mjs:68:16
+[ui]     at async AppRouteRouteModule.do (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+[ui]     at async AppRouteRouteModule.handle (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+[ui]     at async responseGenerator (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9763:38)
+[ui]     at async AppRouteRouteModule.handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:191938)
+[ui]     at async handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9826:32)
+[ui]     at async Module.handler (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9879:13)
+[ui]     at async DevServer.renderToResponseWithComponentsImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1442:9)
+[ui]     at async DevServer.renderPageComponent (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1494:24)
+[ui]     at async DevServer.renderToResponseImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1544:32)
+[ui]     at async DevServer.pipeImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1038:25)
+[ui]     at async NextNodeServer.handleCatchallRenderRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\next-server.js:395:17)
+[ui]     at async DevServer.handleRequestImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:929:17)
+[ui]     at async C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+[ui]     at async Span.traceAsyncFn (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\trace\trace.js:157:20)
+[ui]     at async DevServer.handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+[ui]     at async invokeRender (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:248:21)
+[ui]     at async handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:447:24)
+[ui]     at async requestHandlerImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:496:13)
+[ui]     at async Server.requestListener (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\start-server.js:226:13)
+[ui] Error details: { name: 'Error', message: 'Thread already running', cause: undefined }
+[ui]  POST /api/copilotkit-agents 200 in 223ms (compile: 55ms, render: 168ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 10.6s (compile: 10ms, render: 10.5s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 70ms (compile: 13ms, render: 57ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 13.9s (compile: 4ms, render: 13.9s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 63ms (compile: 13ms, render: 50ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 47ms (compile: 31ms, render: 16ms)
+[agent] INFO:     127.0.0.1:60354 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63229 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:51622 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:58946 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63229 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:58946 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:59895 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:60354 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:59895 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:58946 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] ⨯ ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx:5:1
+[ui] Module not found: Can't resolve '@/components/peerreview/MarkingView'
+[ui] [0m [90m 3 |[39m [36mimport[39m { use[33m,[39m useEffect[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+[ui]  [90m 4 |[39m [36mimport[39m { [33mAppShell[39m } [36mfrom[39m [32m"@/components/peerreview/AppShell"[39m[33m;[39m
+[ui] [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mMarkingView[39m } [36mfrom[39m [32m"@/components/peerreview/MarkingView"[39m[33m;[39m
+[ui]  [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[ui]  [90m 6 |[39m [36mimport[39m { api } [36mfrom[39m [32m"@/lib/peerreview-api"[39m[33m;[39m
+[ui]  [90m 7 |[39m
+[ui]  [90m 8 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mMarkingPage[39m({ params }[33m:[39m { params[33m:[39m [33mPromise[39m[33m<[39m{ id[33m:[39m string[33m;[39m sid[33m:[39m string }[33m>[39m }) {[0m
+[ui] 
+[ui] Import map: aliased to relative './src/components/peerreview/MarkingView' inside of [project]/
+[ui] 
+[ui] 
+[ui] Import traces:
+[ui]   Client Component Browser:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component Browser]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui]   Client Component SSR:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component SSR]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui] https://nextjs.org/docs/messages/module-not-found
+[ui] 
+[ui] 
+[ui] ⨯ ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx:5:1
+[ui] Module not found: Can't resolve '@/components/peerreview/MarkingView'
+[ui] [0m [90m 3 |[39m [36mimport[39m { use[33m,[39m useEffect[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+[ui]  [90m 4 |[39m [36mimport[39m { [33mAppShell[39m } [36mfrom[39m [32m"@/components/peerreview/AppShell"[39m[33m;[39m
+[ui] [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mMarkingView[39m } [36mfrom[39m [32m"@/components/peerreview/MarkingView"[39m[33m;[39m
+[ui]  [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[ui]  [90m 6 |[39m [36mimport[39m { api } [36mfrom[39m [32m"@/lib/peerreview-api"[39m[33m;[39m
+[ui]  [90m 7 |[39m
+[ui]  [90m 8 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mMarkingPage[39m({ params }[33m:[39m { params[33m:[39m [33mPromise[39m[33m<[39m{ id[33m:[39m string[33m;[39m sid[33m:[39m string }[33m>[39m }) {[0m
+[ui] 
+[ui] Import map: aliased to relative './src/components/peerreview/MarkingView' inside of [project]/
+[ui] 
+[ui] 
+[ui] Import traces:
+[ui]   Client Component Browser:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component Browser]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui]   Client Component SSR:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component SSR]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui] https://nextjs.org/docs/messages/module-not-found
+[ui] 
+[ui] 
+[ui] ⨯ ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx:5:1
+[ui] Module not found: Can't resolve '@/components/peerreview/MarkingView'
+[ui] [0m [90m 3 |[39m [36mimport[39m { use[33m,[39m useEffect[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+[ui]  [90m 4 |[39m [36mimport[39m { [33mAppShell[39m } [36mfrom[39m [32m"@/components/peerreview/AppShell"[39m[33m;[39m
+[ui] [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mMarkingView[39m } [36mfrom[39m [32m"@/components/peerreview/MarkingView"[39m[33m;[39m
+[ui]  [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[ui]  [90m 6 |[39m [36mimport[39m { api } [36mfrom[39m [32m"@/lib/peerreview-api"[39m[33m;[39m
+[ui]  [90m 7 |[39m
+[ui]  [90m 8 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mMarkingPage[39m({ params }[33m:[39m { params[33m:[39m [33mPromise[39m[33m<[39m{ id[33m:[39m string[33m;[39m sid[33m:[39m string }[33m>[39m }) {[0m
+[ui] 
+[ui] Import map: aliased to relative './src/components/peerreview/MarkingView' inside of [project]/
+[ui] 
+[ui] 
+[ui] Import traces:
+[ui]   Client Component Browser:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component Browser]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui]   Client Component SSR:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component SSR]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui] https://nextjs.org/docs/messages/module-not-found
+[ui] 
+[ui] 
+[ui] ⨯ ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx:5:1
+[ui] Module not found: Can't resolve '@/components/peerreview/MarkingView'
+[ui] [0m [90m 3 |[39m [36mimport[39m { use[33m,[39m useEffect[33m,[39m useState } [36mfrom[39m [32m"react"[39m[33m;[39m
+[ui]  [90m 4 |[39m [36mimport[39m { [33mAppShell[39m } [36mfrom[39m [32m"@/components/peerreview/AppShell"[39m[33m;[39m
+[ui] [31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m { [33mMarkingView[39m } [36mfrom[39m [32m"@/components/peerreview/MarkingView"[39m[33m;[39m
+[ui]  [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+[ui]  [90m 6 |[39m [36mimport[39m { api } [36mfrom[39m [32m"@/lib/peerreview-api"[39m[33m;[39m
+[ui]  [90m 7 |[39m
+[ui]  [90m 8 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mMarkingPage[39m({ params }[33m:[39m { params[33m:[39m [33mPromise[39m[33m<[39m{ id[33m:[39m string[33m;[39m sid[33m:[39m string }[33m>[39m }) {[0m
+[ui] 
+[ui] Import map: aliased to relative './src/components/peerreview/MarkingView' inside of [project]/
+[ui] 
+[ui] 
+[ui] Import traces:
+[ui]   Client Component Browser:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component Browser]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui]   Client Component SSR:
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Client Component SSR]
+[ui]     ./src/app/(pdf)/a/[id]/s/[sid]/page.tsx [Server Component]
+[ui] 
+[ui] https://nextjs.org/docs/messages/module-not-found
+[ui] 
+[ui] 
+[ui] ✓ Compiled in 921ms
+[agent] WARNING:  StatReload detected changes in 'src\peerreview\pipeline.py'. Reloading...
+[agent]  INFO:     Shutting down
+[agent] INFO:     Waiting for application shutdown.
+[agent] INFO:     Application shutdown complete.
+[agent] INFO:     Finished server process [30268]
+[agent] pnpm dev:agent exited with code 1
+--> Sending SIGTERM to other processes..
+[ui] [?25h
+[ui] pnpm dev:ui exited with code 1
