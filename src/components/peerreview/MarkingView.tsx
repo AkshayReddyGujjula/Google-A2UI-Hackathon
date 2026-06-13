@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { CopilotChat, useAgent } from "@copilotkit/react-core/v2";
 import {
@@ -10,6 +11,7 @@ import {
   Loader2,
   PanelRightClose,
   PanelRightOpen,
+  Trash2,
 } from "lucide-react";
 import { SurfaceCanvas, CanvasEmptyState } from "@/components/pdf-analyst/SurfaceCanvas";
 import { surfaceBus } from "@/a2ui/surface-bus";
@@ -27,18 +29,30 @@ export function MarkingView({
   submissionId: string;
   submissionName: string;
 }) {
+  const router = useRouter();
   const { agent } = useAgent({ agentId: AGENT_ID });
   const isReady = Boolean(agent);
-  const startedRef = useRef(false);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [activityOpen, setActivityOpen] = useState(true);
   const [submissions, setSubmissions] = useState<SubmissionSummary[]>([]);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const reviewThreadId = `review:${workspaceId}:${submissionId}`;
+  const surfaceScope = `peerreview:${workspaceId}:${submissionId}`;
+  const reviewSurfaceId = `peerreview-review:${workspaceId}:${submissionId}`;
+  const finalSurfaceId = `peerreview-final:${workspaceId}:${submissionId}`;
 
   useEffect(() => {
-    surfaceBus.reset(AGENT_ID);
-    startedRef.current = false;
-  }, [submissionId]);
+    surfaceBus.reset(surfaceScope);
+    setReviewError(null);
+  }, [surfaceScope]);
+
+  useEffect(() => {
+    if (!agent) return;
+    const scopedAgent = agent as typeof agent & { threadId?: string };
+    scopedAgent.threadId = reviewThreadId;
+  }, [agent, reviewThreadId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,17 +68,24 @@ export function MarkingView({
   }, [workspaceId, submissionId]);
 
   useEffect(() => {
-    if (!agent || startedRef.current) return;
-    startedRef.current = true;
-    agent.addMessage({
-      id: crypto.randomUUID(),
-      role: "user",
-      content: `Call review_submission with workspace_id="${workspaceId}" and submission_id="${submissionId}".`,
-    });
-    window.setTimeout(() => {
-      void agent.runAgent().catch((e) => console.warn("[marking] runAgent failed", e));
-    }, 50);
-  }, [agent, workspaceId, submissionId]);
+    let cancelled = false;
+    api
+      .reviewSubmissionSurface(workspaceId, submissionId)
+      .then((surface) => {
+        if (cancelled) return;
+        if (![reviewSurfaceId, finalSurfaceId].includes(surface.surfaceId)) {
+          console.warn("[marking] ignoring unexpected surface", surface.surfaceId);
+          return;
+        }
+        surfaceBus.push(surfaceScope, surface.operations);
+      })
+      .catch((e) => {
+        if (!cancelled) setReviewError(String((e as Error).message || e));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceId, submissionId, surfaceScope, reviewSurfaceId, finalSurfaceId]);
 
   const savePdf = async () => {
     const el = surfaceRef.current?.querySelector<HTMLElement>(".a2ui-surface");
@@ -82,6 +103,20 @@ export function MarkingView({
     currentIndex >= 0
       ? submissions.slice(currentIndex + 1).find((s) => s.status !== "approved") ?? submissions[currentIndex + 1]
       : undefined;
+
+  const deleteCurrentSubmission = async () => {
+    if (!window.confirm(`Delete "${submissionName}"? This permanently removes the submission and any review/feedback.`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await api.deleteSubmission(workspaceId, submissionId);
+      surfaceBus.reset(surfaceScope);
+      router.push(`/a/${workspaceId}`);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -108,6 +143,16 @@ export function MarkingView({
         >
           {activityOpen ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
         </button>
+        <button
+          type="button"
+          onClick={() => void deleteCurrentSubmission()}
+          disabled={deleting}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--line)] text-[var(--ink-2)] hover:bg-[color-mix(in_oklab,var(--red)_10%,white)] hover:text-[#7a1b22] disabled:opacity-50"
+          aria-label="Delete current submission"
+          title="Delete submission"
+        >
+          {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+        </button>
         <button onClick={savePdf} disabled={saving}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--line)] text-[12.5px] hover:bg-[var(--surface-soft)] disabled:opacity-50">
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />} Save as PDF
@@ -117,13 +162,15 @@ export function MarkingView({
       <div className="flex-1 min-h-0 flex">
         <div ref={surfaceRef} className="flex-1 min-w-0">
           <SurfaceCanvas
-            key={`${AGENT_ID}:${submissionId}`}
-            channel={AGENT_ID}
+            key={surfaceScope}
+            channel={surfaceScope}
+            agentId={AGENT_ID}
+            acceptedSurfaceIds={[reviewSurfaceId, finalSurfaceId]}
             emptyState={
               <CanvasEmptyState
                 title="Marking..."
-                subtitle="Running the frozen tests against this submission and preparing the evidence."
-                hint={<Loader2 className="animate-spin text-[var(--ink-2)]" />}
+                subtitle={reviewError ?? "Running the frozen tests against this submission and preparing the evidence."}
+                hint={reviewError ? null : <Loader2 className="animate-spin text-[var(--ink-2)]" />}
               />
             }
           />
@@ -148,6 +195,7 @@ export function MarkingView({
             <div className="flex-1 min-h-0">
               <CopilotChat
                 agentId={AGENT_ID}
+                threadId={reviewThreadId}
                 labels={{
                   chatInputPlaceholder: "Ask a follow-up (optional)...",
                   welcomeMessageText: "Marking this submission against the frozen tests...",
@@ -159,7 +207,16 @@ export function MarkingView({
       </div>
 
       {nextSubmission && (
-        <footer className="shrink-0 border-t border-[var(--line)] bg-[var(--surface)] px-4 py-3 flex items-center justify-end">
+        <footer className="shrink-0 border-t border-[var(--line)] bg-[var(--surface)] px-4 py-3 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <div className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+              Submission queue
+            </div>
+            <div className="truncate text-[12.5px] text-[var(--ink-2)]">
+              {currentIndex >= 0 ? `Current ${currentIndex + 1} of ${submissions.length}. ` : ""}
+              Next: <span className="font-medium text-[var(--ink)]">{nextSubmission.name}</span>
+            </div>
+          </div>
           <Link
             href={`/a/${workspaceId}/s/${nextSubmission.id}`}
             className="inline-flex items-center gap-2 rounded-lg bg-[var(--ink)] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#1d1d23]"

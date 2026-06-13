@@ -24,6 +24,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from src.peerreview import generation, model, pipeline, store  # noqa: E402
 from src.review_agent import graph as review_graph  # noqa: E402
+from src.catalog import CATALOG_ID  # noqa: E402
 
 log = logging.getLogger("peerreview")
 app = FastAPI(title="PeerReview.ai")
@@ -139,6 +140,34 @@ def get_sub(wid: str, sid: str):
     if not sub:
         raise HTTPException(404, "submission not found")
     return sub
+
+
+@app.post("/api/assignments/{wid}/submissions/{sid}/review-surface")
+def review_surface(wid: str, sid: str):
+    surface_id, components = pipeline.review_submission(workspace_id=wid, submission_id=sid)
+    return {
+        "surfaceId": surface_id,
+        "operations": [
+            {
+                "version": "v0.9",
+                "createSurface": {"surfaceId": surface_id, "catalogId": CATALOG_ID},
+            },
+            {
+                "version": "v0.9",
+                "updateComponents": {"surfaceId": surface_id, "components": components},
+            },
+        ],
+    }
+
+
+@app.delete("/api/assignments/{wid}/submissions/{sid}")
+def delete_sub(wid: str, sid: str):
+    if not store.get_workspace(wid):
+        raise HTTPException(404, "assignment not found")
+    deleted = store.delete_submission(wid, sid)
+    if not deleted:
+        raise HTTPException(404, "submission not found")
+    return {"deleted": True}
 
 
 def main():

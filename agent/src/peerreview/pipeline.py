@@ -43,21 +43,22 @@ def _warn(surface: str, title: str, body: str) -> tuple[str, list[dict]]:
 
 
 def review_submission(workspace_id: str, submission_id: str) -> tuple[str, list[dict]]:
+    surface_id = surfaces.review_surface_id(workspace_id, submission_id)
     ws = store.get_workspace(workspace_id)
     if not ws:
-        return _warn(surfaces.REVIEW_SURFACE, "Workspace not found", "Create and finalize an assignment first.")
+        return _warn(surface_id, "Workspace not found", "Create and finalize an assignment first.")
     if ws.get("status") != "frozen":
-        return _warn(surfaces.REVIEW_SURFACE, "Workspace not finalized", "Finalize the assignment before marking submissions.")
+        return _warn(surface_id, "Workspace not finalized", "Finalize the assignment before marking submissions.")
     sub = store.get_submission(workspace_id, submission_id)
     if not sub:
-        return _warn(surfaces.REVIEW_SURFACE, "Submission not found", "Add the submission again.")
+        return _warn(surface_id, "Submission not found", "Add the submission again.")
 
     files = sub.get("files", {})
     entry_func = ws.get("entry_function", "")
     loc = ingest.locate_entry(files, entry_func)
     if not loc:
         store.update_submission(workspace_id, submission_id, {"status": "error"})
-        return _warn(surfaces.REVIEW_SURFACE, "Required function not found",
+        return _warn(surface_id, "Required function not found",
                      f"No file defines `{entry_func}(...)` in this submission.")
 
     selected = {t["name"] for t in ws.get("tests", []) if t.get("selected", True)}
@@ -109,15 +110,20 @@ def review_submission(workspace_id: str, submission_id: str) -> tuple[str, list[
         "proposed_scores": {c["id"]: c["proposed"] for c in scorecard},
         "total": proposed_total, "max_total": max_total,
     })
-    return surfaces.REVIEW_SURFACE, surfaces.build_review_surface(review)
+    return surface_id, surfaces.build_review_surface(review)
 
 
 def finalize_feedback(workspace_id: str = "", submission_id: str = "", scores_json: str = "",
-                      show_failed_tests: bool = False, include_resource: bool = False) -> tuple[str, list[dict]]:
+                      show_failed_tests: bool = False, include_resource: bool = False,
+                      diagnosis_json: str = "") -> tuple[str, list[dict]]:
     review = _STATE.get("review")
-    if not review or (workspace_id and review.get("workspace_id") != workspace_id):
-        return _warn(surfaces.FINAL_SURFACE, "Nothing to finalize", "Review a submission first.")
+    if not review or (workspace_id and review.get("workspace_id") != workspace_id) or (
+        submission_id and review.get("submission_id") != submission_id
+    ):
+        surface_id = surfaces.final_surface_id(workspace_id or "unknown", submission_id or "unknown")
+        return _warn(surface_id, "Nothing to finalize", "Review a submission first.")
     wid, sid = review["workspace_id"], review["submission_id"]
+    surface_id = surfaces.final_surface_id(wid, sid)
 
     scorecard = [dict(c) for c in review["scorecard"]]
     if scores_json.strip():
@@ -130,7 +136,30 @@ def finalize_feedback(workspace_id: str = "", submission_id: str = "", scores_js
             pass
     total = sum(c["proposed"] for c in scorecard)
     max_total = sum(c["max"] for c in scorecard)
-    misconception = review["misconception"]
+    misconception = dict(review["misconception"])
+    if diagnosis_json.strip():
+        try:
+            edited = json.loads(diagnosis_json)
+            if isinstance(edited, dict):
+                title = str(edited.get("title") or misconception.get("title") or "").strip()
+                explanation = str(edited.get("explanation") or misconception.get("explanation") or "").strip()
+                label = str(edited.get("label") or misconception.get("label") or "ta_edited").strip()
+                evidence = edited.get("evidence", misconception.get("evidence", []))
+                if isinstance(evidence, str):
+                    evidence = [evidence]
+                if not isinstance(evidence, list):
+                    evidence = misconception.get("evidence", [])
+                misconception.update({
+                    "detected": bool(title or explanation or misconception.get("detected")),
+                    "label": label,
+                    "title": title,
+                    "explanation": explanation,
+                    "evidence": [str(e) for e in evidence if str(e).strip()],
+                    "severity": edited.get("severity") or misconception.get("severity", "medium"),
+                    "edited_by_ta": True,
+                })
+        except (json.JSONDecodeError, TypeError, ValueError):
+            pass
 
     fb = analysis.build_feedback(review["spec"], scorecard, misconception, review.get("reference"),
                                  include_resource, total, max_total)
@@ -143,6 +172,7 @@ def finalize_feedback(workspace_id: str = "", submission_id: str = "", scores_js
         "scores": {c["id"]: c["proposed"] for c in scorecard},
         "total": total, "max_total": max_total,
         "misconception_labels": [misconception["label"]] if misconception.get("detected") and misconception.get("label") else [],
+        "diagnosis": misconception,
         "feedback": fb["plain_text"], "show_failed_tests": show_failed_tests,
     })
 
@@ -154,4 +184,4 @@ def finalize_feedback(workspace_id: str = "", submission_id: str = "", scores_js
         "submission_name": review.get("submission_name", ""),
         "show_failed_tests": show_failed_tests, "failed_tests": failed,
     }
-    return surfaces.FINAL_SURFACE, surfaces.build_final_surface(final)
+    return surface_id, surfaces.build_final_surface(final)

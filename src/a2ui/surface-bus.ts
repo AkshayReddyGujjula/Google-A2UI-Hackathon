@@ -22,7 +22,7 @@ const buffers = new Map<string, A2UIOp[]>();
 const surfaceIds = new Map<string, string | null>();
 const listeners = new Map<string, Set<Listener>>();
 
-function getSurfaceIdFromOp(op: A2UIOp): string | undefined {
+export function getSurfaceIdFromOp(op: A2UIOp): string | undefined {
   const cs = (op.createSurface as { surfaceId?: string } | undefined)
     ?.surfaceId;
   const uc = (op.updateComponents as { surfaceId?: string } | undefined)
@@ -30,6 +30,18 @@ function getSurfaceIdFromOp(op: A2UIOp): string | undefined {
   const ud = (op.updateDataModel as { surfaceId?: string } | undefined)
     ?.surfaceId;
   return cs ?? uc ?? ud;
+}
+
+export function peerReviewScopeFromSurfaceId(surfaceId?: string): string | undefined {
+  if (!surfaceId) return undefined;
+  const parts = surfaceId.split(":");
+  if (
+    parts.length >= 3 &&
+    (parts[0] === "peerreview-review" || parts[0] === "peerreview-final")
+  ) {
+    return `peerreview:${parts[1]}:${parts[2]}`;
+  }
+  return undefined;
 }
 
 const DEBUG = typeof window !== "undefined";
@@ -51,23 +63,15 @@ function opSummary(op: A2UIOp): string {
 
 export const surfaceBus = {
   push(channel: string, ops: A2UIOp[]) {
-    const buf = buffers.get(channel) ?? [];
-    const before = buf.length;
-    buf.push(...ops);
-    buffers.set(channel, buf);
+    pushToChannel(channel, ops);
+
+    const scoped = new Map<string, A2UIOp[]>();
     for (const op of ops) {
-      const sid = getSurfaceIdFromOp(op);
-      if (sid) surfaceIds.set(channel, sid);
+      const scope = peerReviewScopeFromSurfaceId(getSurfaceIdFromOp(op));
+      if (!scope || scope === channel) continue;
+      scoped.set(scope, [...(scoped.get(scope) ?? []), op]);
     }
-    const subCount = listeners.get(channel)?.size ?? 0;
-    if (DEBUG) {
-      console.log(
-        `[surface-bus] push channel=${channel} +${ops.length} ops ` +
-          `(buf ${before}→${buf.length}, subs=${subCount}) [${ops.map(opSummary).join(", ")}]`,
-      );
-    }
-    const snap = this.snapshot(channel);
-    listeners.get(channel)?.forEach((fn) => fn(snap));
+    for (const [scope, scopeOps] of scoped) pushToChannel(scope, scopeOps);
   },
 
   reset(channel: string) {
@@ -101,3 +105,27 @@ export const surfaceBus = {
     };
   },
 };
+
+function pushToChannel(channel: string, ops: A2UIOp[]) {
+  if (!ops.length) return;
+    const buf = buffers.get(channel) ?? [];
+    const before = buf.length;
+    buf.push(...ops);
+    buffers.set(channel, buf);
+    for (const op of ops) {
+      const sid = getSurfaceIdFromOp(op);
+      if (sid) surfaceIds.set(channel, sid);
+    }
+    const subCount = listeners.get(channel)?.size ?? 0;
+    if (DEBUG) {
+      console.log(
+        `[surface-bus] push channel=${channel} +${ops.length} ops ` +
+          `(buf ${before}→${buf.length}, subs=${subCount}) [${ops.map(opSummary).join(", ")}]`,
+      );
+    }
+    const snap = {
+      surfaceId: surfaceIds.get(channel) ?? null,
+      ops: buffers.get(channel) ?? [],
+    };
+    listeners.get(channel)?.forEach((fn) => fn(snap));
+}

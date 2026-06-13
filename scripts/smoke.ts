@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * pnpm smoke — Composite gate, the load-bearing CI check.
+ * pnpm smoke â€” Composite gate, the load-bearing CI check.
  *
  * PeerReview.ai default: the FastAPI agent at `agent/main.py` exposes
  * POST /setup and /review on :8123. Smoke imports the app, checks those
@@ -9,27 +9,27 @@
  * env check, so smoke is exit-0 statically with no API key.
  *
  * Runs (in order, failing fast):
- *   1. `pnpm verify-pins`               — lockfile / package.json drift
- *   2. `pnpm validate-widget --examples`— other-examples/EXAMPLE.json files
+ *   1. `pnpm verify-pins`               â€” lockfile / package.json drift
+ *   2. `pnpm validate-widget --examples`â€” other-examples/EXAMPLE.json files
  *   3. `pnpm validate-widget` over every JSON in the widget/schema dirs
- *   4. `pnpm test:widgets`              — fixture renderer pass (delegates to validator)
- *   4a. `pnpm test:schemas`             — pytest path-vs-data alignment, SKIPPED when
+ *   4. `pnpm test:widgets`              â€” fixture renderer pass (delegates to validator)
+ *   4a. `pnpm test:schemas`             â€” pytest path-vs-data alignment, SKIPPED when
  *                                         agent/tests/ is absent (pdf-analyst ships no
  *                                         pytest suite at the agent root yet)
- *   5. offline envelope shape check     — validates public/offline-envelopes.json
+ *   5. offline envelope shape check     â€” validates public/offline-envelopes.json
  *                                         structure if present; SKIPPED when absent
  *                                         (it was archived with PortKit)
- *   6. agent endpoint probe             — import agent/main.py's FastAPI app and assert
+ *   6. agent endpoint probe             â€” import agent/main.py's FastAPI app and assert
  *                                         /setup and /review are registered
  *                                         (static import; no live model call)
- *   6a. offline /setup probe            — with OFFLINE=1 and GEMINI_API_KEY removed,
+ *   6a. offline /setup probe            â€” with OFFLINE=1 and GEMINI_API_KEY removed,
  *                                         import the setup graph and invoke it
  *                                         in-process; assert the tool result carries
  *                                         real A2UI surface ops (createSurface /
  *                                         updateComponents). FAILS
  *                                         loudly if the no-key offline path errors or
  *                                         emits no surface. No uvicorn, no port, no key.
- *   7. agent connectivity probe (live)  — SKIPPED when OFFLINE=1 or no GEMINI_API_KEY
+ *   7. agent connectivity probe (live)  â€” SKIPPED when OFFLINE=1 or no GEMINI_API_KEY
  *
  * Exit non-zero if any step fails. Machine-parsable summary at the end.
  */
@@ -171,7 +171,12 @@ function findWidgetJsons(): string[] {
 }
 
 // The FastAPI endpoints the PeerReview.ai app must register.
-const REQUIRED_AGENT_ENDPOINTS = ["/setup", "/review"];
+const REQUIRED_AGENT_ENDPOINTS = [
+  "/review",
+  "/api/assignments",
+  "/api/assignments/{wid}/submissions",
+  "/api/assignments/{wid}/submissions/{sid}",
+];
 const OPTIONAL_AGENT_ENDPOINTS: string[] = [];
 
 const STEPS: Step[] = [
@@ -224,8 +229,8 @@ const STEPS: Step[] = [
     name: "explain sanity (pnpm explain themes resolves a HACKATHON.md section)",
     run: async () => {
       // Regression guard: `pnpm explain` must keep matching HACKATHON.md's
-      // live seam headings ("## §N — Title"). It silently rotted once when
-      // the doc's heading style changed — this step makes that loud.
+      // live seam headings ("## Â§N â€” Title"). It silently rotted once when
+      // the doc's heading style changed â€” this step makes that loud.
       const explainScript = join(REPO_ROOT, "scripts", "explain.ts");
       const res = spawnSync(PNPM, [...PNPM_PREFIX, "exec", "tsx", explainScript, "themes"], {
         cwd: REPO_ROOT,
@@ -239,9 +244,9 @@ const STEPS: Step[] = [
       }
       if (!out.includes("Re-theme")) {
         console.error(out);
-        return { pass: false, detail: "explain output missing the §1 section" };
+        return { pass: false, detail: "explain output missing the Â§1 section" };
       }
-      console.log(`${GREEN}✓${RESET} ${DIM}pnpm explain themes printed the §1 section.${RESET}\n`);
+      console.log(`${GREEN}âœ“${RESET} ${DIM}pnpm explain themes printed the Â§1 section.${RESET}\n`);
       return { pass: true, detail: "explain resolves seam sections" };
     },
   },
@@ -255,7 +260,7 @@ const STEPS: Step[] = [
       const testsDir = join(REPO_ROOT, "agent", "tests");
       if (!existsSync(testsDir)) {
         console.log(
-          `${YELLOW}!${RESET} ${DIM}agent/tests/ not present — no pytest schema suite to run. Skipping.${RESET}\n`,
+          `${YELLOW}!${RESET} ${DIM}agent/tests/ not present â€” no pytest schema suite to run. Skipping.${RESET}\n`,
         );
         return { pass: true, detail: "skipped (no agent/tests/)" };
       }
@@ -280,71 +285,71 @@ const STEPS: Step[] = [
         const raw = readFileSync(offlinePath, "utf-8");
         const parsed = JSON.parse(raw);
 
-        // The new wrapper shape (plan §6.6) has byPrompt + bySurface.
+        // The new wrapper shape (plan Â§6.6) has byPrompt + bySurface.
         // We accept the legacy flat shape too (just prompt-keyed) for back-compat.
         const hasWrapper =
           parsed && typeof parsed === "object" &&
           (parsed.byPrompt || parsed.bySurface);
 
         if (!hasWrapper) {
-          // Legacy shape — accept if it contains A2UI markers anywhere in the file.
+          // Legacy shape â€” accept if it contains A2UI markers anywhere in the file.
           if (!raw.includes("createSurface") && !raw.includes("surfaceId")) {
             console.error(
-              `${RED}✗${RESET} public/offline-envelopes.json doesn't reference any A2UI envelope (no createSurface or surfaceId found).`,
+              `${RED}âœ—${RESET} public/offline-envelopes.json doesn't reference any A2UI envelope (no createSurface or surfaceId found).`,
             );
             return { pass: false, detail: "envelope check failed: no A2UI markers" };
           }
           console.log(
-            `${GREEN}✓${RESET} ${DIM}offline-envelopes.json parses and contains A2UI envelope markers (legacy shape).${RESET}\n`,
+            `${GREEN}âœ“${RESET} ${DIM}offline-envelopes.json parses and contains A2UI envelope markers (legacy shape).${RESET}\n`,
           );
           return { pass: true, detail: "parsed (legacy shape)" };
         }
 
-        // Wrapper shape — validate the bySurface map.
+        // Wrapper shape â€” validate the bySurface map.
         const bySurface = parsed.bySurface as Record<string, unknown> | undefined;
         if (!bySurface || typeof bySurface !== "object") {
           console.error(
-            `${RED}✗${RESET} offline-envelopes.json wrapper is missing 'bySurface' object.`,
+            `${RED}âœ—${RESET} offline-envelopes.json wrapper is missing 'bySurface' object.`,
           );
           return { pass: false, detail: "missing bySurface" };
         }
         const surfaceCount = Object.keys(bySurface).length;
         if (surfaceCount === 0) {
           console.error(
-            `${RED}✗${RESET} 'bySurface' is empty — at least one surface required.`,
+            `${RED}âœ—${RESET} 'bySurface' is empty â€” at least one surface required.`,
           );
           return { pass: false, detail: "empty bySurface" };
         }
         for (const [surfaceId, envs] of Object.entries(bySurface)) {
           if (!Array.isArray(envs) || envs.length === 0) {
             console.error(
-              `${RED}✗${RESET} bySurface["${surfaceId}"] is not a non-empty array of envelopes.`,
+              `${RED}âœ—${RESET} bySurface["${surfaceId}"] is not a non-empty array of envelopes.`,
             );
             return { pass: false, detail: `bad bySurface entry: ${surfaceId}` };
           }
         }
         // (PortKit pinned a required "contract-review" surface here; the
-        // pdf-analyst default has no such hard requirement — any non-empty
+        // pdf-analyst default has no such hard requirement â€” any non-empty
         // bySurface map is accepted. Re-add a required-surface assertion here
         // if a future offline file must guarantee a specific surface.)
         console.log(
-          `${GREEN}✓${RESET} ${DIM}offline-envelopes.json wrapper valid (${surfaceCount} surface${surfaceCount === 1 ? "" : "s"} indexed: ${Object.keys(bySurface).join(", ")}).${RESET}\n`,
+          `${GREEN}âœ“${RESET} ${DIM}offline-envelopes.json wrapper valid (${surfaceCount} surface${surfaceCount === 1 ? "" : "s"} indexed: ${Object.keys(bySurface).join(", ")}).${RESET}\n`,
         );
         return { pass: true, detail: `${surfaceCount} surfaces indexed` };
       } catch (e) {
-        console.error(`${RED}✗${RESET} offline-envelopes.json is invalid JSON: ${(e as Error).message}`);
+        console.error(`${RED}âœ—${RESET} offline-envelopes.json is invalid JSON: ${(e as Error).message}`);
         return { pass: false, detail: "invalid JSON" };
       }
     },
   },
   {
-    name: "agent endpoint probe (FastAPI /setup + /review)",
+    name: "agent endpoint probe (FastAPI /review + REST API)",
     run: async () => {
       // pdf-analyst default swap: the agent is now the FastAPI app at
       // agent/main.py, not a langgraph-cli graph. Assert it imports cleanly
       // and registers the expected endpoints. We boot `python -c "..."`
       // against the agent's .venv so this is a deterministic, OFFLINE-safe
-      // check — importing the app builds the LLM clients (with a placeholder
+      // check â€” importing the app builds the LLM clients (with a placeholder
       // key) but makes NO live model call.
       const agentDir = join(REPO_ROOT, "agent");
       const mainPy = join(agentDir, "main.py");
@@ -361,11 +366,11 @@ const STEPS: Step[] = [
       const pythonBin = existsSync(venvPython) ? venvPython : "python3";
       if (!existsSync(venvPython)) {
         console.log(
-          `${YELLOW}!${RESET} ${DIM}agent/.venv/bin/python not found — using system python3. Run \`pnpm install:agent\` to bootstrap.${RESET}\n`,
+          `${YELLOW}!${RESET} ${DIM}agent/.venv/bin/python not found â€” using system python3. Run \`pnpm install:agent\` to bootstrap.${RESET}\n`,
         );
       }
-      // Cross the JS → Python boundary as Python list literals (string
-      // elements, no unpacking — JSON arrays of strings are valid Python
+      // Cross the JS â†’ Python boundary as Python list literals (string
+      // elements, no unpacking â€” JSON arrays of strings are valid Python
       // list literals so JSON.stringify is safe here).
       const requiredPy = JSON.stringify(REQUIRED_AGENT_ENDPOINTS);
       const optionalPy = JSON.stringify(OPTIONAL_AGENT_ENDPOINTS);
@@ -410,7 +415,7 @@ if missing:
 print(f"\\nFastAPI app registers all required endpoints ({required}); optional present: {present_optional}.")
 sys.exit(0)
 `;
-      // Provide a placeholder GEMINI_API_KEY — the agents construct
+      // Provide a placeholder GEMINI_API_KEY â€” the agents construct
       // ChatGoogleGenerativeAI clients at import time. The probe imports the
       // app, it does NOT make a live call, so a placeholder is sufficient.
       const probeEnv = {
@@ -437,22 +442,16 @@ sys.exit(0)
     },
   },
   {
-    name: "offline /setup probe (OFFLINE=1, no key → real A2UI surface)",
+    name: "offline review surface probe (no key -> real A2UI surface)",
     run: async () => {
-      // The OFFLINE=1 gate. The endpoint probe above proves the app IMPORTS;
-      // this proves the setup graph actually PAINTS a surface offline. It
-      // imports the setup graph and invokes it in-process (no uvicorn, no
-      // port) with OFFLINE=1 and GEMINI_API_KEY explicitly removed, then
-      // asserts the emitted tool result carries the A2UI surface ops
-      // (a2ui_operations / createSurface / updateComponents).
-      // This closes the "smoke green while `dev` fails" gap: a regression that
-      // breaks the no-key offline emission (e.g. an eager Gemini client or a
-      // broken stub) FAILS here loudly.
+      // Build the current PeerReview.ai review/final A2UI component trees
+      // directly, with no model key and no server. This keeps smoke static
+      // while catching catalog/surface drift.
       const agentDir = join(REPO_ROOT, "agent");
       const mainPy = join(agentDir, "main.py");
       if (!existsSync(mainPy)) {
         console.log(
-          `${YELLOW}!${RESET} ${DIM}agent/main.py not found. Skipping offline /setup probe.${RESET}\n`,
+          `${YELLOW}!${RESET} ${DIM}agent/main.py not found. Skipping offline review surface probe.${RESET}\n`,
         );
         return { pass: true, detail: "skipped (no agent/main.py)" };
       }
@@ -463,54 +462,80 @@ sys.exit(0)
       const pythonBin = existsSync(venvPython) ? venvPython : "python3";
       if (!existsSync(venvPython)) {
         console.log(
-          `${YELLOW}!${RESET} ${DIM}agent/.venv/bin/python not found — using system python3. Run \`pnpm install:agent\` to bootstrap.${RESET}\n`,
+          `${YELLOW}!${RESET} ${DIM}agent/.venv/bin/python not found â€” using system python3. Run \`pnpm install:agent\` to bootstrap.${RESET}\n`,
         );
       }
       const script = `
 import sys
 
 try:
-    from langchain_core.messages import HumanMessage, ToolMessage
-    from src.setup_agent import graph
+    from src.peerreview import surfaces
 except Exception as e:
     import traceback
     traceback.print_exc()
-    print(f"\\nFAIL: importing the setup graph (OFFLINE=1, no key) raised {type(e).__name__}: {e}")
+    print(f"\\nFAIL: importing peerreview surfaces raised {type(e).__name__}: {e}")
     sys.exit(1)
 
-try:
-    result = graph.invoke(
-        {"messages": [HumanMessage("Set up the BFS marking workspace.")]},
-        config={"configurable": {"thread_id": "smoke-offline-setup"}},
-    )
-except Exception as e:
-    import traceback
-    traceback.print_exc()
-    print(f"\\nFAIL: invoking the offline setup graph raised {type(e).__name__}: {e}")
+review_id = surfaces.review_surface_id("smoke-workspace", "smoke-submission")
+final_id = surfaces.final_surface_id("smoke-workspace", "smoke-submission")
+review = surfaces.build_review_surface({
+    "workspace_id": "smoke-workspace",
+    "submission_id": "smoke-submission",
+    "assignment_title": "Smoke assignment",
+    "submission_name": "Smoke student",
+    "source": "smoke",
+    "repo": {"file_count": 1, "entry_file": "solution.py", "entry_func": "shortest_path"},
+    "entry_code": "def shortest_path(graph, start, goal):\\n    return [start, goal]\\n",
+    "diff": {"summary": {"total": 1, "passed": 0, "failed": 1}, "cases": [{
+        "name": "case 1", "status": "failed", "message": "expected ['A', 'B'] but got ['A']",
+        "input": [{"from": "A", "to": "B"}], "expected": ["A", "B"], "actual": ["A"],
+    }]},
+    "misconception": {"detected": True, "label": "smoke", "title": "Smoke diagnosis",
+                      "severity": "medium", "explanation": "A deterministic smoke diagnosis.",
+                      "evidence": ["case 1 failed"]},
+    "trace": None,
+    "scorecard": [{"id": "correctness", "label": "Correctness", "max": 5, "proposed": 3,
+                   "rationale": "Smoke rationale"}],
+    "proposed_total": 3,
+    "max_total": 5,
+    "calibration": {"count": 0},
+})
+final = surfaces.build_final_surface({
+    "greeting": "Feedback",
+    "letter_paragraphs": ["Smoke feedback paragraph."],
+    "plain_text": "Feedback\\nSmoke feedback paragraph.",
+    "breakdown": [{"label": "Correctness", "score": 3, "max": 5}],
+    "total": 3,
+    "max_total": 5,
+    "grade_caption": "Pass",
+    "submission_name": "Smoke student",
+})
+
+required_review_components = {"GradeApprovalPanel", "TestResultsPanel", "MisconceptionPanel"}
+required_final_components = {"CopyFeedbackPanel", "DataTable", "StatCard"}
+review_components = {c.get("component") for c in review}
+final_components = {c.get("component") for c in final}
+missing_review = sorted(required_review_components - review_components)
+missing_final = sorted(required_final_components - final_components)
+if review_id != "peerreview-review:smoke-workspace:smoke-submission":
+    print(f"FAIL: review surface id is not scoped: {review_id}")
     sys.exit(1)
 
-tool_msgs = [m for m in result.get("messages", []) if isinstance(m, ToolMessage)]
-if not tool_msgs:
-    print("FAIL: offline setup produced no ToolMessage — no A2UI surface emitted.")
+if final_id != "peerreview-final:smoke-workspace:smoke-submission":
+    print(f"FAIL: final surface id is not scoped: {final_id}")
     sys.exit(1)
 
-content = "".join(str(m.content) for m in tool_msgs)
-markers = ["a2ui_operations", "createSurface", "updateComponents"]
-missing = [mk for mk in markers if mk not in content]
-if missing:
-    print(f"FAIL: offline setup tool result is missing A2UI surface markers: {missing}")
+if missing_review or missing_final:
+    print(f"FAIL: surface components missing review={missing_review}, final={missing_final}")
     sys.exit(1)
 
-for mk in markers:
-    print(f"  OK: {mk}")
-print("\\nOffline setup emitted a real A2UI surface (no key, OFFLINE=1).")
+print(f"  OK: {review_id}")
+print(f"  OK: {final_id}")
+print("\\nOffline PeerReview.ai surfaces include review gate and feedback handoff.")
 sys.exit(0)
 `;
-      // Explicitly REMOVE the key so this proves the no-key path. Unlike the
-      // endpoint probe (which supplies a placeholder), the whole point here is
-      // that OFFLINE=1 needs no key at all. Strip both env names the SDK reads
-      // (GEMINI_API_KEY / GOOGLE_API_KEY) by destructuring them out of the
-      // inherited env, then force OFFLINE=1.
+      // Explicitly remove model keys: this surface-builder check should not
+      // depend on live Gemini credentials.
       const {
         GEMINI_API_KEY: _gemini,
         GOOGLE_API_KEY: _google,
@@ -523,14 +548,14 @@ sys.exit(0)
         env: offlineEnv,
       });
       if (res.status === 0) {
-        return { pass: true, detail: "offline /setup painted a real A2UI surface (no key)" };
+        return { pass: true, detail: "offline review/final surfaces built (no key)" };
       }
       if (res.status === 1) {
-        return { pass: false, detail: "offline /setup did not emit an A2UI surface (no key)" };
+        return { pass: false, detail: "offline PeerReview.ai surface probe failed" };
       }
       // Non-1 exit: probe couldn't run (missing venv/python). Warn, don't fail.
       console.log(
-        `${YELLOW}!${RESET} ${DIM}offline /setup probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
+        `${YELLOW}!${RESET} ${DIM}offline review surface probe could not run (exit ${res.status}). Run \`pnpm install:agent\` to bootstrap the venv.${RESET}\n`,
       );
       return { pass: true, detail: `skipped (probe exit ${res.status})` };
     },
@@ -538,11 +563,11 @@ sys.exit(0)
   {
     name: "agent connectivity probe (live one-shot tool call against Gemini)",
     run: async () => {
-      // LIVE check — requires a running, Gemini-backed agent + GEMINI_API_KEY.
+      // LIVE check â€” requires a running, Gemini-backed agent + GEMINI_API_KEY.
       // Reuses the standalone probe-gemini.sh script (exercises a tool call
       // against the configured model). This is a SKIP whenever there's no key
       // or OFFLINE=1, so `pnpm smoke` is exit-0 statically. Future
-      // improvement: "boot FastAPI agent → POST canned prompt to /fixed →
+      // improvement: "boot FastAPI agent â†’ POST canned prompt to /fixed â†’
       // assert a createSurface envelope" once there's a deterministic boot
       // ritual we can call from CI.
       const probeScript = join(REPO_ROOT, "scripts", "probe-gemini.sh");
@@ -550,15 +575,15 @@ sys.exit(0)
         console.log(`${YELLOW}!${RESET} ${DIM}probe-gemini.sh not found. Skipping.${RESET}\n`);
         return { pass: true, detail: "skipped (no probe script)" };
       }
-      // Skip when no key — let CI decide whether that's OK via OFFLINE=1.
+      // Skip when no key â€” let CI decide whether that's OK via OFFLINE=1.
       if (!process.env.GEMINI_API_KEY && process.env.OFFLINE !== "1") {
         console.log(
           `${YELLOW}!${RESET} ${DIM}SKIP: live agent probe requires a running agent + GEMINI_API_KEY (neither GEMINI_API_KEY nor OFFLINE=1 set).${RESET}\n`,
         );
-        return { pass: true, detail: "skipped (no key — requires running agent + key)" };
+        return { pass: true, detail: "skipped (no key â€” requires running agent + key)" };
       }
       if (process.env.OFFLINE === "1") {
-        console.log(`${DIM}OFFLINE=1 — skipping live model probe.${RESET}\n`);
+        console.log(`${DIM}OFFLINE=1 â€” skipping live model probe.${RESET}\n`);
         return { pass: true, detail: "skipped (OFFLINE=1)" };
       }
       return shellRun("bash", [probeScript]);
@@ -567,32 +592,32 @@ sys.exit(0)
 ];
 
 async function main(): Promise<void> {
-  console.log(`${BOLD}pnpm smoke${RESET} — composite gate\n`);
+  console.log(`${BOLD}pnpm smoke${RESET} â€” composite gate\n`);
 
   let failed = 0;
 
   for (const step of STEPS) {
-    console.log(`${BOLD}━━━ ${step.name} ━━━${RESET}`);
+    console.log(`${BOLD}â”â”â” ${step.name} â”â”â”${RESET}`);
     const t0 = Date.now();
     const res = await step.run();
     const ms = Date.now() - t0;
     results.push({ name: step.name, ...res });
     if (!res.pass) {
       failed++;
-      // Fail fast — first failure is usually informative enough.
+      // Fail fast â€” first failure is usually informative enough.
       console.error(
         `\n${RED}${BOLD}Step "${step.name}" failed (${ms}ms).${RESET} Stopping early.\n`,
       );
       break;
     }
-    console.log(`${DIM}  → step done in ${ms}ms${RESET}\n`);
+    console.log(`${DIM}  â†’ step done in ${ms}ms${RESET}\n`);
   }
 
   // Summary
-  console.log(`${BOLD}━━━ smoke summary ━━━${RESET}`);
+  console.log(`${BOLD}â”â”â” smoke summary â”â”â”${RESET}`);
   for (const r of results) {
-    const icon = r.pass ? `${GREEN}✓${RESET}` : `${RED}✗${RESET}`;
-    console.log(`  ${icon} ${r.name} ${DIM}— ${r.detail}${RESET}`);
+    const icon = r.pass ? `${GREEN}âœ“${RESET}` : `${RED}âœ—${RESET}`;
+    console.log(`  ${icon} ${r.name} ${DIM}â€” ${r.detail}${RESET}`);
   }
   // List steps that didn't run
   const ran = new Set(results.map((r) => r.name));

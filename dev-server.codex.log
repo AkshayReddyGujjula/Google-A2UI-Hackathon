@@ -382,3 +382,38 @@ Done in 349ms using pnpm v11.6.0
 [agent] INFO:     127.0.0.1:54981 - "GET /api/assignments HTTP/1.1" 200 OK
 [ui]  POST /api/copilotkit-agents 200 in 8.7s (compile: 5ms, render: 8.7s)
 [ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 53ms (compile: 10ms, render: 43ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa 200 in 382ms (compile: 32ms, render: 350ms)
+[ui]  POST /api/copilotkit-agents 200 in 68ms (compile: 40ms, render: 29ms)
+[agent] INFO:     127.0.0.1:64639 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50946 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:64639 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57493 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 172ms (compile: 19ms, render: 153ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 172ms (compile: 58ms, render: 115ms)
+[ui]  GET / 200 in 164ms (compile: 38ms, render: 126ms)
+[agent] INFO:     127.0.0.1:57493 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:64639 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  GET / 200 in 168ms (compile: 32ms, render: 135ms)
+[ui]  GET /a/shortest-path-in-an-unweighted-g-17b3aa/s/sub-0dadac3c 200 in 188ms (compile: 35ms, render: 152ms)
+[ui]  POST /api/copilotkit-agents 200 in 16ms (compile: 6ms, render: 10ms)
+[agent] INFO:     127.0.0.1:56846 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:59873 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56841 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56841 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:59873 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56841 - "GET /api/assignments/shortest-path-in-an-unweighted-g-17b3aa/submissions HTTP/1.1" 200 OK
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 122ms (compile: 17ms, render: 105ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 116ms (compile: 67ms, render: 49ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 8.7s (compile: 2ms, render: 8.7s)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 188ms (compile: 40ms, render: 148ms)
+[agent] WARNING:  StatReload detected changes in 'src\peerreview\store.py'. Reloading...
+[agent]  INFO:     Shutting down
+[agent] INFO:     Waiting for application shutdown.
+[agent] INFO:     Application shutdown complete.
+[agent] INFO:     Finished server process [27500]
+[agent] pnpm dev:agent exited with code 1
+--> Sending SIGTERM to other processes..
+[ui] [?25h
+[ui] pnpm dev:ui exited with code 1

@@ -1,5 +1,7 @@
 /** Typed client for the PeerReview.ai agent REST API (FastAPI on :8123).
  *  CRUD + generation + freeze. The review/feedback path goes via CopilotKit. */
+import type { A2UIOp } from "@/a2ui/surface-bus";
+
 const BASE = process.env.NEXT_PUBLIC_AGENT_URL || "http://localhost:8123";
 
 export type WorkspaceSummary = {
@@ -38,6 +40,11 @@ export type SubmissionSummary = {
   status: "pending" | "reviewed" | "approved" | "error";
   total?: number;
   max_total?: number;
+};
+
+export type ReviewSurfaceResponse = {
+  surfaceId: string;
+  operations: A2UIOp[];
 };
 
 async function call(path: string, opts: RequestInit = {}) {
@@ -80,4 +87,8 @@ export const api = {
     body: { name?: string; source_type: "pasted" | "github"; github_url?: string; pasted_files_json?: string },
   ): Promise<SubmissionSummary> =>
     call(`/api/assignments/${id}/submissions`, { method: "POST", body: JSON.stringify(body) }),
+  deleteSubmission: (workspaceId: string, submissionId: string): Promise<{ deleted: boolean }> =>
+    call(`/api/assignments/${workspaceId}/submissions/${submissionId}`, { method: "DELETE" }),
+  reviewSubmissionSurface: (workspaceId: string, submissionId: string): Promise<ReviewSurfaceResponse> =>
+    call(`/api/assignments/${workspaceId}/submissions/${submissionId}/review-surface`, { method: "POST" }),
 };

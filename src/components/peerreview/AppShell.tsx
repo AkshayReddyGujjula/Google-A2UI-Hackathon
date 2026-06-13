@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { CheckCircle2, FolderClosed, Plus } from "lucide-react";
+import { CheckCircle2, FolderClosed, Plus, Trash2 } from "lucide-react";
 import { api, type WorkspaceSummary } from "@/lib/peerreview-api";
 import { CreateAssignmentWizard } from "./CreateAssignmentWizard";
 
@@ -40,6 +40,15 @@ export function AppShell({ activeId, children }: { activeId?: string; children: 
     refresh();
   }, [refresh]);
 
+  const deleteAssignment = async (workspace: WorkspaceSummary) => {
+    if (!window.confirm(`Delete "${workspace.title}"? This permanently removes the assignment and all submissions.`)) {
+      return;
+    }
+    await api.deleteAssignment(workspace.id);
+    refresh();
+    if (activeId === workspace.id) router.push("/");
+  };
+
   return (
     <div className="h-screen flex bg-[var(--bg)] text-[var(--ink)]">
       <aside className="w-64 shrink-0 border-r border-[var(--line)] bg-[var(--surface)] flex flex-col">
@@ -64,13 +73,13 @@ export function AppShell({ activeId, children }: { activeId?: string; children: 
             </p>
           )}
           {workspaces.map((w) => (
-            <Link
+            <div
               key={w.id}
-              href={`/a/${w.id}`}
-              className={`group flex items-start gap-2 px-2.5 py-2 rounded-lg transition ${
+              className={`group flex items-start gap-2 rounded-lg transition ${
                 activeId === w.id ? "bg-[var(--surface-soft)]" : "hover:bg-[var(--surface-soft)]"
               }`}
             >
+              <Link href={`/a/${w.id}`} className="min-w-0 flex flex-1 items-start gap-2 px-2.5 py-2">
               <FolderClosed size={16} className="mt-0.5 shrink-0 text-[var(--lilac)]" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[13px] font-medium truncate">{w.title}</span>
@@ -79,10 +88,20 @@ export function AppShell({ activeId, children }: { activeId?: string; children: 
                   {w.status === "frozen" ? "ready" : "draft"} · {w.marked_count}/{w.submission_count} marked
                 </span>
               </span>
+              </Link>
               {w.submission_count > 0 && w.marked_count === w.submission_count && (
-                <CheckCircle2 size={14} className="mt-0.5 text-[var(--mint)]" />
+                <CheckCircle2 size={14} className="mt-2.5 text-[var(--mint)]" />
               )}
-            </Link>
+              <button
+                type="button"
+                onClick={() => void deleteAssignment(w)}
+                className="mr-1 mt-1.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[var(--ink-2)] opacity-0 transition hover:bg-[color-mix(in_oklab,var(--red)_10%,white)] hover:text-[#7a1b22] group-hover:opacity-100 focus:opacity-100"
+                aria-label={`Delete ${w.title}`}
+                title="Delete assignment"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
           ))}
         </nav>
       </aside>

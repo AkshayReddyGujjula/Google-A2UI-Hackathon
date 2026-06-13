@@ -8,7 +8,7 @@ import {
 } from "@copilotkit/a2ui-renderer";
 import { useAgent } from "@copilotkit/react-core/v2";
 import { catalog } from "@/a2ui/catalog";
-import { surfaceBus } from "@/a2ui/surface-bus";
+import { getSurfaceIdFromOp, surfaceBus } from "@/a2ui/surface-bus";
 
 /* The big workspace pane. A page-level A2UIProvider subscribes to the
  * surface bus so any surface produced by chat renders here at canvas size.
@@ -20,12 +20,16 @@ import { surfaceBus } from "@/a2ui/surface-bus";
  * a `log_a2ui_event` tool result so the agent's reasoning step can react. */
 export function SurfaceCanvas({
   channel,
+  agentId = channel,
   emptyState,
+  acceptedSurfaceIds,
 }: {
   channel: string;
+  agentId?: string;
   emptyState: React.ReactNode;
+  acceptedSurfaceIds?: string[];
 }) {
-  const { agent } = useAgent({ agentId: channel });
+  const { agent } = useAgent({ agentId });
 
   return (
     <A2UIProvider
@@ -67,7 +71,11 @@ export function SurfaceCanvas({
         }, 0);
       }}
     >
-      <CanvasInner channel={channel} emptyState={emptyState} />
+      <CanvasInner
+        channel={channel}
+        emptyState={emptyState}
+        acceptedSurfaceIds={acceptedSurfaceIds}
+      />
     </A2UIProvider>
   );
 }
@@ -75,9 +83,11 @@ export function SurfaceCanvas({
 function CanvasInner({
   channel,
   emptyState,
+  acceptedSurfaceIds,
 }: {
   channel: string;
   emptyState: React.ReactNode;
+  acceptedSurfaceIds?: string[];
 }) {
   const actions = useA2UIActions();
   const [surfaceId, setSurfaceId] = useState<string | null>(null);
@@ -93,7 +103,13 @@ function CanvasInner({
     ops: typeof seenRef extends never ? never : Array<Record<string, unknown>>,
   ) {
     if (!ops.length) return;
+    const accepted = acceptedSurfaceIds ? new Set(acceptedSurfaceIds) : null;
     const out = ops.filter((op) => {
+      const sid = getSurfaceIdFromOp(op);
+      if (accepted && sid && !accepted.has(sid)) {
+        console.log(`[surface-canvas] ignore stale op for ${sid}`);
+        return false;
+      }
       const cs = op.createSurface as { surfaceId?: string } | undefined;
       if (cs?.surfaceId) {
         if (createdSurfacesRef.current.has(cs.surfaceId)) {
@@ -122,7 +138,9 @@ function CanvasInner({
     if (initial.ops.length) {
       applyOps(initial.ops as never);
       seenRef.current = initial.ops.length;
-      setSurfaceId(initial.surfaceId);
+      if (initial.surfaceId && (!acceptedSurfaceIds || acceptedSurfaceIds.includes(initial.surfaceId))) {
+        setSurfaceId(initial.surfaceId);
+      }
     }
     return surfaceBus.subscribe(channel, (snap) => {
       const tail = snap.ops.slice(seenRef.current);
@@ -133,7 +151,9 @@ function CanvasInner({
       );
       if (tail.length) applyOps(tail as never);
       seenRef.current = snap.ops.length;
-      if (snap.surfaceId) setSurfaceId(snap.surfaceId);
+      if (snap.surfaceId && (!acceptedSurfaceIds || acceptedSurfaceIds.includes(snap.surfaceId))) {
+        setSurfaceId(snap.surfaceId);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actions, channel]);

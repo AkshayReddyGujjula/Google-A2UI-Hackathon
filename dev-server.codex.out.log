@@ -1,0 +1,478 @@
+Already up to date
+Done in 736ms using pnpm v11.6.0
+[ui] $ next dev --turbopack
+[agent] $ node scripts/run-agent.mjs
+[agent] INFO:     Will watch for changes in these directories: ['C:\\Users\\aksha\\Desktop\\Hackathons\\Google-A2UI Hackathon\\Google-A2UI-Hackathon\\agent']
+[ui] ▲ Next.js 16.1.6 (Turbopack)
+[ui] - Local:         http://localhost:3000
+[ui] - Network:       http://172.16.0.2:3000
+[ui] - Environments: .env
+[ui] 
+[ui] ✓ Starting...
+[ui] ✓ Ready in 1999ms
+[ui] ⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+[ui] Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[agent] INFO:     Uvicorn running on http://127.0.0.1:8123 (Press CTRL+C to quit)
+[agent] INFO:     Started reloader process [27772] using StatReload
+[ui] ○ Compiling /a/[id] ...
+[agent] INFO:     Started server process [29548]
+[agent] INFO:     Waiting for application startup.
+[agent] INFO:     Application startup complete.
+[ui]  GET /a/codex-smoke-delete 200 in 40s (compile: 34.4s, render: 5.9s)
+[ui]  GET / 200 in 2.2s (compile: 571ms, render: 1644ms)
+[ui]  GET / 200 in 298ms (compile: 84ms, render: 213ms)
+[agent] INFO:     127.0.0.1:61376 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:61376 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:58446 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] [CopilotKit Runtime] anonymous telemetry enabled — see https://docs.copilotkit.ai/telemetry to opt out (set COPILOTKIT_TELEMETRY_DISABLED=true).
+[ui]  POST /api/copilotkit-agents 200 in 8.5s (compile: 8.4s, render: 43ms)
+[agent] INFO:     127.0.0.1:60485 - "OPTIONS /api/assignments HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 23ms (compile: 12ms, render: 11ms)
+[agent] INFO:     127.0.0.1:60485 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 281ms (compile: 121ms, render: 161ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 301ms (compile: 233ms, render: 67ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 83ms (compile: 9ms, render: 75ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 83ms (compile: 39ms, render: 44ms)
+[ui]  GET /a/codex-smoke-delete 200 in 243ms (compile: 34ms, render: 210ms)
+[ui]  POST /api/copilotkit-agents 200 in 14ms (compile: 9ms, render: 5ms)
+[agent] INFO:     127.0.0.1:65398 - "OPTIONS /api/assignments/codex-smoke-delete HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:54992 - "OPTIONS /api/assignments/codex-smoke-delete/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:65398 - "GET /api/assignments/codex-smoke-delete HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:56943 - "GET /api/assignments/codex-smoke-delete/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:54992 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 191ms (compile: 64ms, render: 127ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 76ms (compile: 12ms, render: 64ms)
+[agent] INFO:     127.0.0.1:49230 - "DELETE /api/assignments/codex-smoke-delete HTTP/1.1" 200 OK
+[ui]  GET / 200 in 1035ms (compile: 248ms, render: 787ms)
+[agent] INFO:     127.0.0.1:55476 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 73ms (compile: 37ms, render: 36ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=default 404 in 180ms (compile: 27ms, render: 153ms)
+[ui]  GET /api/copilotkit-agents/threads?agentId=review_agent 404 in 98ms (compile: 33ms, render: 65ms)
+[agent] INFO:     127.0.0.1:55476 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55476 - "DELETE /api/assignments/shortest-path-in-an-unweighted-g-17b3aa HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55476 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:64485 - "POST /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:64485 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  GET /a/shortest-path-in-an-unweighted-g-fc6892 200 in 251ms (compile: 211ms, render: 41ms)
+[agent] INFO:     127.0.0.1:64485 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55482 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50193 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57915 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55482 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:50193 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55482 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57915 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:64485 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57915 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:60394 - "PATCH /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:60394 - "OPTIONS /api/assignments/shortest-path-in-an-unweighted-g-fc6892/freeze HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:60394 - "POST /api/assignments/shortest-path-in-an-unweighted-g-fc6892/freeze HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:57884 - "POST /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[ui] ○ Compiling /a/[id]/s/[sid] ...
+[ui]  GET /a/shortest-path-in-an-unweighted-g-fc6892/s/sub-efa7d0bf 200 in 11.8s (compile: 11.4s, render: 437ms)
+[agent] INFO:     127.0.0.1:63380 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:65473 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63380 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:60801 - "GET /api/assignments HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:65473 - "GET /api/assignments/shortest-path-in-an-unweighted-g-fc6892/submissions HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:63380 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui]  POST /api/copilotkit-agents 200 in 60ms (compile: 16ms, render: 44ms)
+[ui] Error running agent: Error: Thread already running
+[ui]     at ignore-listed frames
+[ui] Error stack: Error: Thread already running
+[ui]     at InMemoryAgentRunner.run (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/runner/in-memory.mjs:30:30)
+[ui]     at observableFactory (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:12:43)
+[ui]     at file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:35:28
+[ui]     at createSseEventResponse (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/shared/sse-response.mjs:91:4)
+[ui]     at handleSseRun (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/sse/run.mjs:6:9)
+[ui]     at handleRunAgent (file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/handlers/handle-run.mjs:43:10)
+[ui]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[ui]     at async file:///C:/Users/aksha/Desktop/Hackathons/Google-A2UI%20Hackathon/Google-A2UI-Hackathon/node_modules/.pnpm/@copilotkit+runtime@1.57.4__42f80a427873b56f0a4a1334de984fb9/node_modules/@copilotkit/runtime/dist/v2/runtime/core/fetch-handler.mjs:68:16
+[ui]     at async AppRouteRouteModule.do (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+[ui]     at async AppRouteRouteModule.handle (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+[ui]     at async responseGenerator (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9763:38)
+[ui]     at async AppRouteRouteModule.handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:191938)
+[ui]     at async handleResponse (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9826:32)
+[ui]     at async Module.handler (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\.next\dev\server\chunks\079ae_next_dist_dbfdec16._.js:9879:13)
+[ui]     at async DevServer.renderToResponseWithComponentsImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1442:9)
+[ui]     at async DevServer.renderPageComponent (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1494:24)
+[ui]     at async DevServer.renderToResponseImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1544:32)
+[ui]     at async DevServer.pipeImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:1038:25)
+[ui]     at async NextNodeServer.handleCatchallRenderRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\next-server.js:395:17)
+[ui]     at async DevServer.handleRequestImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\base-server.js:929:17)
+[ui]     at async C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+[ui]     at async Span.traceAsyncFn (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\trace\trace.js:157:20)
+[ui]     at async DevServer.handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+[ui]     at async invokeRender (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:248:21)
+[ui]     at async handleRequest (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:447:24)
+[ui]     at async requestHandlerImpl (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\router-server.js:496:13)
+[ui]     at async Server.requestListener (C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\node_modules\.pnpm\next@16.1.6_@opentelemetry+_cdf16b0c29c87bb9614658b251959a32\node_modules\next\dist\server\lib\start-server.js:226:13)
+[ui] Error details: { name: 'Error', message: 'Thread already running', cause: undefined }
+[ui]  POST /api/copilotkit-agents 200 in 375ms (compile: 15ms, render: 360ms)
+[agent] INFO:     ::1:0 - "POST /review HTTP/1.1" 200 OK
+[agent] C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py:49: UserWarning: install_httpx_hook: client of type Client has no recognized event_hooks attribute; x-* headers will not be forwarded
+[agent]   install_httpx_hook(client)
+[agent] C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py:49: UserWarning: install_httpx_hook: client of type AsyncClient has no recognized event_hooks attribute; x-* headers will not be forwarded
+[agent]   install_httpx_hook(client)
+[agent] ERROR:    Exception in ASGI application
+[agent]   + Exception Group Traceback (most recent call last):
+[agent]   |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_utils.py", line 81, in collapse_excgroups
+[agent]   |     yield
+[agent]   |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 274, in __call__
+[agent]   |     async with anyio.create_task_group() as task_group:
+[agent]   |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 799, in __aexit__
+[agent]   |     raise BaseExceptionGroup(
+[agent]   | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+[agent]   +-+---------------- 1 ----------------
+[agent]     | Traceback (most recent call last):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 415, in run_asgi
+[agent]     |     result = await app(  # type: ignore[func-returns-value]
+[agent]     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+[agent]     |     return await self.app(scope, receive, send)
+[agent]     |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\applications.py", line 1159, in __call__
+[agent]     |     await super().__call__(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+[agent]     |     await self.middleware_stack(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+[agent]     |     raise exc
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+[agent]     |     await self.app(scope, receive, _send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+[agent]     |     await self.app(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+[agent]     |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+[agent]     |     raise exc
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+[agent]     |     await app(scope, receive, sender)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+[agent]     |     await self.app(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+[agent]     |     await self.middleware_stack(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+[agent]     |     await route.handle(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 276, in handle
+[agent]     |     await self.app(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\routing.py", line 134, in app
+[agent]     |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+[agent]     |     raise exc
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+[agent]     |     await app(scope, receive, sender)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\routing.py", line 121, in app
+[agent]     |     await response(scope, receive, send)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 273, in __call__
+[agent]     |     with collapse_excgroups():
+[agent]     |          ^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+[agent]     |     self.gen.throw(value)
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+[agent]     |     raise exc
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 277, in wrap
+[agent]     |     await func()
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 250, in stream_response
+[agent]     |     async for chunk in self.body_iterator:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\endpoint.py", line 26, in event_generator
+[agent]     |     async for event in request_agent.run(input_data):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\langgraph_agui_agent.py", line 192, in run
+[agent]     |     async for event in super().run(input):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\agent.py", line 177, in run
+[agent]     |     async for event_str in self._handle_stream_events(input.copy(update={"forwarded_props": forwarded_props})):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\agent.py", line 255, in _handle_stream_events
+[agent]     |     async for event in stream:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+[agent]     |     async for event in event_stream:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+[agent]     |     await task
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+[agent]     |     async for _ in event_streamer.tap_output_aiter(run_id, stream):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+[agent]     |     async for chunk in output:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+[agent]     |     async for _ in runner.atick(
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 557, in atick
+[agent]     |     _panic_or_proceed(
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 687, in _panic_or_proceed
+[agent]     |     raise exc
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+[agent]     |     async for _ in task.proc.astream(task.input, config):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+[agent]     |     output = await asyncio.create_task(
+[agent]     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+[agent]     |     async for chunk in it:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+[agent]     |     first = await anext(output, sentinel)
+[agent]     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+[agent]     |     async for ichunk in input:
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+[agent]     |     yield await self.ainvoke(input, config, **kwargs)
+[agent]     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+[agent]     |     ret = await self.afunc(*args, **kwargs)
+[agent]     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 1383, in amodel_node
+[agent]     |     result = await awrap_model_call_handler(request, _execute_model_async)
+[agent]     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 358, in normalized_single
+[agent]     |     return _to_composed_result(await single_handler(request, handler))
+[agent]     |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langsmith\run_helpers.py", line 644, in async_wrapper
+[agent]     |     function_result = await asyncio.create_task(  # type: ignore[call-arg]
+[agent]     |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py", line 371, in awrap_model_call
+[agent]     |     return await handler(request)
+[agent]     |            ^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 1352, in _execute_model_async
+[agent]     |     output = await model_.ainvoke(messages)
+[agent]     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5894, in ainvoke
+[agent]     |     return await self.bound.ainvoke(
+[agent]     |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 497, in ainvoke
+[agent]     |     llm_result = await self.agenerate_prompt(
+[agent]     |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1834, in agenerate_prompt
+[agent]     |     return await self.agenerate(
+[agent]     |            ^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1792, in agenerate
+[agent]     |     raise exceptions[0]
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 2084, in _agenerate_with_cache
+[agent]     |     async for chunk in self._astream(messages, stop=stop, **kwargs):
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_google_genai\chat_models.py", line 3350, in _astream
+[agent]     |     stream = await self.client.aio.models.generate_content_stream(
+[agent]     |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 8698, in generate_content_stream
+[agent]     |     response = await self._generate_content_stream(
+[agent]     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 7150, in _generate_content_stream
+[agent]     |     request_dict = _GenerateContentParameters_to_mldev(
+[agent]     |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 1635, in _GenerateContentParameters_to_mldev
+[agent]     |     for item in t.t_contents(getv(from_object, ['contents']))
+[agent]     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]     |   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\_transformers.py", line 482, in t_contents
+[agent]     |     raise ValueError('contents are required.')
+[agent]     | ValueError: contents are required.
+[agent]     | During task with name 'model' and id '917fbbb7-fa2d-54d1-9364-57bcc76796ed'
+[agent]     +------------------------------------
+[agent] 
+[agent] During handling of the above exception, another exception occurred:
+[agent] 
+[agent] Traceback (most recent call last):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 415, in run_asgi
+[agent]     result = await app(  # type: ignore[func-returns-value]
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 63, in __call__
+[agent]     return await self.app(scope, receive, send)
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\applications.py", line 1159, in __call__
+[agent]     await super().__call__(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\applications.py", line 90, in __call__
+[agent]     await self.middleware_stack(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\errors.py", line 186, in __call__
+[agent]     raise exc
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\errors.py", line 164, in __call__
+[agent]     await self.app(scope, receive, _send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\cors.py", line 88, in __call__
+[agent]     await self.app(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+[agent]     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+[agent]     raise exc
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+[agent]     await app(scope, receive, sender)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+[agent]     await self.app(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 660, in __call__
+[agent]     await self.middleware_stack(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 680, in app
+[agent]     await route.handle(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\routing.py", line 276, in handle
+[agent]     await self.app(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\routing.py", line 134, in app
+[agent]     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+[agent]     raise exc
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+[agent]     await app(scope, receive, sender)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\fastapi\routing.py", line 121, in app
+[agent]     await response(scope, receive, send)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 273, in __call__
+[agent]     with collapse_excgroups():
+[agent]          ^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py", line 158, in __exit__
+[agent]     self.gen.throw(value)
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\_utils.py", line 87, in collapse_excgroups
+[agent]     raise exc
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 277, in wrap
+[agent]     await func()
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\starlette\responses.py", line 250, in stream_response
+[agent]     async for chunk in self.body_iterator:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\endpoint.py", line 26, in event_generator
+[agent]     async for event in request_agent.run(input_data):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\langgraph_agui_agent.py", line 192, in run
+[agent]     async for event in super().run(input):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\agent.py", line 177, in run
+[agent]     async for event_str in self._handle_stream_events(input.copy(update={"forwarded_props": forwarded_props})):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\ag_ui_langgraph\agent.py", line 255, in _handle_stream_events
+[agent]     async for event in stream:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1607, in _astream_events_v1_v2
+[agent]     async for event in event_stream:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1100, in _astream_events_implementation_v2
+[agent]     await task
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 1055, in consume_astream
+[agent]     async for _ in event_streamer.tap_output_aiter(run_id, stream):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 222, in tap_output_aiter
+[agent]     async for chunk in output:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\main.py", line 3407, in astream
+[agent]     async for _ in runner.atick(
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 557, in atick
+[agent]     _panic_or_proceed(
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_runner.py", line 687, in _panic_or_proceed
+[agent]     raise exc
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\pregel\_retry.py", line 703, in arun_with_retry
+[agent]     async for _ in task.proc.astream(task.input, config):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 867, in astream
+[agent]     output = await asyncio.create_task(
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 932, in _consume_aiter
+[agent]     async for chunk in it:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\tracers\event_stream.py", line 199, in tap_output_aiter
+[agent]     first = await anext(output, sentinel)
+[agent]             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1767, in atransform
+[agent]     async for ichunk in input:
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 1171, in astream
+[agent]     yield await self.ainvoke(input, config, **kwargs)
+[agent]           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langgraph\_internal\_runnable.py", line 501, in ainvoke
+[agent]     ret = await self.afunc(*args, **kwargs)
+[agent]           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 1383, in amodel_node
+[agent]     result = await awrap_model_call_handler(request, _execute_model_async)
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 358, in normalized_single
+[agent]     return _to_composed_result(await single_handler(request, handler))
+[agent]                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langsmith\run_helpers.py", line 644, in async_wrapper
+[agent]     function_result = await asyncio.create_task(  # type: ignore[call-arg]
+[agent]                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\copilotkit\copilotkit_lg_middleware.py", line 371, in awrap_model_call
+[agent]     return await handler(request)
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain\agents\factory.py", line 1352, in _execute_model_async
+[agent]     output = await model_.ainvoke(messages)
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\runnables\base.py", line 5894, in ainvoke
+[agent]     return await self.bound.ainvoke(
+[agent]            ^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 497, in ainvoke
+[agent]     llm_result = await self.agenerate_prompt(
+[agent]                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1834, in agenerate_prompt
+[agent]     return await self.agenerate(
+[agent]            ^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 1792, in agenerate
+[agent]     raise exceptions[0]
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_core\language_models\chat_models.py", line 2084, in _agenerate_with_cache
+[agent]     async for chunk in self._astream(messages, stop=stop, **kwargs):
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\langchain_google_genai\chat_models.py", line 3350, in _astream
+[agent]     stream = await self.client.aio.models.generate_content_stream(
+[agent]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 8698, in generate_content_stream
+[agent]     response = await self._generate_content_stream(
+[agent]                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 7150, in _generate_content_stream
+[agent]     request_dict = _GenerateContentParameters_to_mldev(
+[agent]                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\models.py", line 1635, in _GenerateContentParameters_to_mldev
+[agent]     for item in t.t_contents(getv(from_object, ['contents']))
+[agent]                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[agent]   File "C:\Users\aksha\Desktop\Hackathons\Google-A2UI Hackathon\Google-A2UI-Hackathon\agent\.venv\Lib\site-packages\google\genai\_transformers.py", line 482, in t_contents
+[agent]     raise ValueError('contents are required.')
+[agent] ValueError: contents are required.
+[agent] During task with name 'model' and id '917fbbb7-fa2d-54d1-9364-57bcc76796ed'
+[ui] Agent execution failed: TypeError: terminated
+[ui]     at ignore-listed frames {
+[ui]   [cause]: Error [SocketError]: other side closed
+[ui]       at ignore-listed frames {
+[ui]     code: 'UND_ERR_SOCKET',
+[ui]     socket: {
+[ui]       localAddress: '127.0.0.1',
+[ui]       localPort: 65476,
+[ui]       remoteAddress: '127.0.0.1',
+[ui]       remotePort: 8123,
+[ui]       remoteFamily: 'IPv4',
+[ui]       timeout: undefined,
+[ui]       bytesWritten: 538,
+[ui]       bytesRead: 5779
+[ui]     }
+[ui]   }
+[ui] }
+[ui]  POST /api/copilotkit-agents 200 in 1295ms (compile: 13ms, render: 1282ms)
+[ui]  POST /api/copilotkit-agents 200 in 1297ms (compile: 96ms, render: 1201ms)
+[ui] TypeError: terminated
+[ui]     at ignore-listed frames {
+[ui]   [cause]: Error [SocketError]: other side closed
+[ui]       at ignore-listed frames {
+[ui]     code: 'UND_ERR_SOCKET',
+[ui]     socket: {
+[ui]       localAddress: '127.0.0.1',
+[ui]       localPort: 65476,
+[ui]       remoteAddress: '127.0.0.1',
+[ui]       remotePort: 8123,
+[ui]       remoteFamily: 'IPv4',
+[ui]       timeout: undefined,
+[ui]       bytesWritten: 538,
+[ui]       bytesRead: 5779
+[ui]     }
+[ui]   }
+[ui] }
+[ui] ⨯ unhandledRejection: TypeError: terminated
+[ui]     at ignore-listed frames {
+[ui]   [cause]: Error [SocketError]: other side closed
+[ui]       at ignore-listed frames {
+[ui]     code: 'UND_ERR_SOCKET',
+[ui]     socket: {
+[ui]       localAddress: '127.0.0.1',
+[ui]       localPort: 65476,
+[ui]       remoteAddress: '127.0.0.1',
+[ui]       remotePort: 8123,
+[ui]       remoteFamily: 'IPv4',
+[ui]       timeout: undefined,
+[ui]       bytesWritten: 538,
+[ui]       bytesRead: 5779
+[ui]     }
+[ui]   }
+[ui] }
+[ui] ⨯ unhandledRejection:  TypeError: terminated
+[ui]     at ignore-listed frames {
+[ui]   [cause]: Error [SocketError]: other side closed
+[ui]       at ignore-listed frames {
+[ui]     code: 'UND_ERR_SOCKET',
+[ui]     socket: {
+[ui]       localAddress: '127.0.0.1',
+[ui]       localPort: 65476,
+[ui]       remoteAddress: '127.0.0.1',
+[ui]       remotePort: 8123,
+[ui]       remoteFamily: 'IPv4',
+[ui]       timeout: undefined,
+[ui]       bytesWritten: 538,
+[ui]       bytesRead: 5779
+[ui]     }
+[ui]   }
+[ui] }
+[ui] ✓ Finished filesystem cache database compaction in 13.8s
+[ui] ✓ Compiled in 1175ms
+[agent] [ELIFECYCLE] Command failed with exit code 4294967295.
+[agent] INFO:     127.0.0.1:55799 - "DELETE /api/assignments/shortest-path-in-an-unweighted-g-fc6892 HTTP/1.1" 200 OK
+[agent] INFO:     127.0.0.1:55799 - "GET /api/assignments HTTP/1.1" 200 OK
+[ui] [?25h
+[ui] [ELIFECYCLE] Command failed with exit code 4294967295.
+[ui] pnpm dev:ui exited with code 4294967295
+--> Sending SIGTERM to other processes..

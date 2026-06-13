@@ -113,6 +113,14 @@ def get_submission(wid: str, sid: str) -> dict[str, Any] | None:
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
+def delete_submission(wid: str, sid: str) -> bool:
+    p = _wdir(wid) / "submissions" / f"{sid}.json"
+    if not p.exists():
+        return False
+    p.unlink()
+    return True
+
+
 def update_submission(wid: str, sid: str, patch: dict[str, Any]) -> dict[str, Any] | None:
     sub = get_submission(wid, sid)
     if not sub:

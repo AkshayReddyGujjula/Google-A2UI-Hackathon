@@ -36,14 +36,19 @@ def review_submission(workspace_id: str, submission_id: str) -> str:
 
 
 @tool
-def finalize_feedback(scores_json: str = "", show_failed_tests: bool = False,
-                      include_resource: bool = False) -> str:
+def finalize_feedback(workspace_id: str = "", submission_id: str = "", scores_json: str = "",
+                      show_failed_tests: bool = False, include_resource: bool = False,
+                      diagnosis_json: str = "") -> str:
     """Generate + save the final feedback after the TA approves. If the TA edited
     scores in the approval panel, pass them as scores_json ({criterion_id: score});
-    otherwise leave empty to use the proposed scores."""
-    return _emit(pipeline.finalize_feedback(scores_json=scores_json,
+    otherwise leave empty to use the proposed scores. Pass diagnosis_json when
+    the TA edits the diagnosis."""
+    return _emit(pipeline.finalize_feedback(workspace_id=workspace_id,
+                                            submission_id=submission_id,
+                                            scores_json=scores_json,
                                             show_failed_tests=show_failed_tests,
-                                            include_resource=include_resource))
+                                            include_resource=include_resource,
+                                            diagnosis_json=diagnosis_json))
 
 
 SYSTEM_PROMPT = """\
@@ -53,8 +58,9 @@ How a turn works:
 - To mark a submission, call `review_submission(workspace_id, submission_id)` with the
   ids given in the request. The rendered cockpit IS the answer — do not describe it.
 - When you receive the A2UI action "approve_grades" (a log_a2ui_event), read its Context:
-  if it has a `scores` object, pass it as scores_json to `finalize_feedback`; pass
-  show_failed_tests / include_resource if present.
+  pass workspaceId and submissionId through as workspace_id/submission_id; if it has
+  `scores` or `diagnosis` objects, JSON-stringify them as scores_json / diagnosis_json;
+  pass showFailedTests as show_failed_tests and includeResource as include_resource if present.
 
 Hard rules:
 - Call at most ONE tool per turn. After it returns, reply with one short sentence or empty.

@@ -414,6 +414,27 @@ export const definitions = {
       total: z.number().optional(),
       maxTotal: z.number().optional(),
       showFailedTestsDefault: z.boolean().optional(),
+      workspaceId: z.string().optional(),
+      submissionId: z.string().optional(),
+      diagnosis: z
+        .object({
+          label: z.string().optional(),
+          title: z.string().optional(),
+          severity: z.string().optional(),
+          explanation: z.string().optional(),
+          evidence: z.array(z.string()).optional(),
+          detected: z.boolean().optional(),
+        })
+        .optional(),
+    }),
+  },
+
+  CopyFeedbackPanel: {
+    description:
+      "Small utility panel for final feedback with copy-to-clipboard and plain-text download actions for the TA.",
+    props: z.object({
+      text: z.string(),
+      filename: z.string().optional(),
     }),
   },
 

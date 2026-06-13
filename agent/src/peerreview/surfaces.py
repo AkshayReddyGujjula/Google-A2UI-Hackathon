@@ -15,6 +15,14 @@ FINAL_SURFACE = "peerreview-final"
 SETUP_SURFACE = "peerreview-setup"  # retained for compatibility
 
 
+def review_surface_id(workspace_id: str, submission_id: str) -> str:
+    return f"{REVIEW_SURFACE}:{workspace_id}:{submission_id}"
+
+
+def final_surface_id(workspace_id: str, submission_id: str) -> str:
+    return f"{FINAL_SURFACE}:{workspace_id}:{submission_id}"
+
+
 class Builder:
     def __init__(self) -> None:
         self.nodes: list[dict[str, Any]] = []
@@ -50,6 +58,7 @@ def _trace_props(t: dict[str, Any]) -> dict[str, Any]:
         "expectedEdges": t.get("expected_edges"),
         "studentEdges": t.get("student_edges"),
         "isMinimal": t.get("is_minimal"),
+        "studentError": t.get("student_error"),
     }
 
 
@@ -131,7 +140,10 @@ def build_review_surface(rv: dict[str, Any]) -> list[dict[str, Any]]:
     children.append(b.add("Section", title="Approve", eyebrow="YOU DECIDE",
         child=b.add("GradeApprovalPanel", criteria=rv.get("scorecard", []),
                     total=rv.get("proposed_total", 0), maxTotal=rv.get("max_total", 0),
-                    showFailedTestsDefault=False)))
+                    showFailedTestsDefault=False,
+                    workspaceId=rv.get("workspace_id", ""),
+                    submissionId=rv.get("submission_id", ""),
+                    diagnosis=rv.get("misconception", {}))))
 
     return b.finish("Stack", gap="lg", children=children)
 
@@ -146,6 +158,10 @@ def build_final_surface(fb: dict[str, Any]) -> list[dict[str, Any]]:
     for p in fb.get("letter_paragraphs", []):
         letter.append(b.add("Text", text=p))
     children.append(b.add("Card", tone="lilac", child=b.add("Stack", gap="sm", children=letter)))
+    if fb.get("plain_text"):
+        children.append(b.add("CopyFeedbackPanel",
+                              text=fb.get("plain_text", ""),
+                              filename=f"{fb.get('submission_name', 'submission')}-feedback.txt"))
 
     rows = [{"criterion": c["label"], "score": f"{c['score']}/{c['max']}"} for c in fb.get("breakdown", [])]
     children.append(b.add("Section", title="Mark breakdown", eyebrow="APPROVED",

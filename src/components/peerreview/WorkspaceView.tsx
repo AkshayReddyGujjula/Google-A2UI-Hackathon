@@ -77,6 +77,21 @@ export function WorkspaceView({ id }: { id: string }) {
     }
   };
 
+  const deleteSubmission = async (submission: SubmissionSummary) => {
+    if (!window.confirm(`Delete "${submission.name}"? This permanently removes the submission and any review/feedback.`)) {
+      return;
+    }
+    setBusy("Deleting submission...");
+    try {
+      await api.deleteSubmission(id, submission.id);
+      setSubs((prev) => prev.filter((s) => s.id !== submission.id));
+    } catch (e) {
+      setErr(String((e as Error).message));
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="max-w-3xl mx-auto px-6 py-6">
@@ -201,15 +216,29 @@ export function WorkspaceView({ id }: { id: string }) {
             <div className="mt-3 flex flex-col gap-1">
               {subs.length === 0 && <p className="text-[12.5px] text-[var(--ink-2)] px-1">No submissions yet. Add one above to start marking.</p>}
               {subs.map((s) => (
-                <Link key={s.id} href={`/a/${id}/s/${s.id}`}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] hover:border-[var(--lilac)] transition">
-                  <span className={`h-2 w-2 rounded-full shrink-0 ${
-                    s.status === "approved" ? "bg-[var(--mint)]" : s.status === "error" ? "bg-[var(--red)]" : s.status === "reviewed" ? "bg-[var(--lilac)]" : "bg-[var(--ink-2)]"
-                  }`} />
-                  <span className="text-[13px] font-medium flex-1 truncate">{s.name}</span>
-                  <span className="mono text-[11px] text-[var(--ink-2)]">{s.status}</span>
-                  {s.total != null && <span className="mono text-[12px] font-medium">{s.total}/{s.max_total}</span>}
-                </Link>
+                <div
+                  key={s.id}
+                  className="group flex items-center gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] transition hover:border-[var(--lilac)]"
+                >
+                  <Link href={`/a/${id}/s/${s.id}`} className="min-w-0 flex flex-1 items-center gap-3 px-3 py-2.5">
+                    <span className={`h-2 w-2 rounded-full shrink-0 ${
+                      s.status === "approved" ? "bg-[var(--mint)]" : s.status === "error" ? "bg-[var(--red)]" : s.status === "reviewed" ? "bg-[var(--lilac)]" : "bg-[var(--ink-2)]"
+                    }`} />
+                    <span className="text-[13px] font-medium flex-1 truncate">{s.name}</span>
+                    <span className="mono text-[11px] text-[var(--ink-2)]">{s.status}</span>
+                    {s.total != null && <span className="mono text-[12px] font-medium">{s.total}/{s.max_total}</span>}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => void deleteSubmission(s)}
+                    disabled={busy === "Deleting submission..."}
+                    className="mr-2 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[var(--ink-2)] opacity-0 transition hover:bg-[color-mix(in_oklab,var(--red)_10%,white)] hover:text-[#7a1b22] disabled:opacity-40 group-hover:opacity-100 focus:opacity-100"
+                    aria-label={`Delete ${s.name}`}
+                    title="Delete submission"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               ))}
             </div>
           </Section>

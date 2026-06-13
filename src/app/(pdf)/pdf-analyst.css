@@ -142,3 +142,46 @@
   padding-right: 12px;
   padding-bottom: 10px;
 }
+
+.pdf-analyst-root .marking-activity {
+  color: var(--ink);
+}
+
+.pdf-analyst-root .marking-activity [data-testid="copilot-chat"],
+.pdf-analyst-root .marking-activity [class*="copilotKitChat"] {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+.pdf-analyst-root .marking-activity [data-testid="copilot-chat-input"],
+.pdf-analyst-root .marking-activity [class*="copilotKitInput"] {
+  min-height: 68px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 16px !important;
+  background: var(--surface-soft) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+
+.pdf-analyst-root .marking-activity [data-testid="copilot-chat-textarea"],
+.pdf-analyst-root .marking-activity textarea {
+  color: var(--ink) !important;
+  caret-color: var(--ink) !important;
+  background: transparent !important;
+}
+
+.pdf-analyst-root .marking-activity [data-testid="copilot-chat-textarea"]::placeholder,
+.pdf-analyst-root .marking-activity textarea::placeholder {
+  color: var(--ink-2) !important;
+  opacity: 0.85;
+}
+
+.pdf-analyst-root .marking-activity button {
+  color: inherit;
+}
+
+.pdf-analyst-root .marking-activity [data-testid="copilot-chat-input"] button,
+.pdf-analyst-root .marking-activity [class*="copilotKitInput"] button {
+  border-color: var(--line) !important;
+  background: var(--surface) !important;
+}

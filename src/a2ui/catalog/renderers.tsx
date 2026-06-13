@@ -1328,13 +1328,49 @@ const VisualGraphTracePanel = ({
       layer: n.layer ?? null,
     };
   });
+  const edgeKey = (a: string, b: string) => [a, b].sort().join("--");
   const pairs = (path?: string[] | null) => {
     const s = new Set<string>();
-    if (Array.isArray(path)) for (let i = 0; i < path.length - 1; i++) s.add(`${path[i]}->${path[i + 1]}`);
+    if (Array.isArray(path)) for (let i = 0; i < path.length - 1; i++) s.add(edgeKey(path[i], path[i + 1]));
     return s;
   };
   const expected = pairs(active.expectedPath);
   const student = pairs(active.studentPath);
+  const pathSegments = (path?: string[] | null, offset = 0) => {
+    if (!Array.isArray(path)) return [];
+    return path.slice(0, -1).flatMap((from, i) => {
+      const to = path[i + 1];
+      const a = pos[from];
+      const b = pos[to];
+      if (!a || !b) return [];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const ox = (-dy / len) * offset;
+      const oy = (dx / len) * offset;
+      return [{
+        key: `${from}-${to}-${i}`,
+        x1: a.x + ox,
+        y1: a.y + oy,
+        x2: b.x + ox,
+        y2: b.y + oy,
+        shared: expected.has(edgeKey(from, to)) && student.has(edgeKey(from, to)),
+      }];
+    });
+  };
+  const expectedSegments = pathSegments(active.expectedPath, 0);
+  const studentSegments = pathSegments(active.studentPath, 0);
+  const expectedLayer = expectedSegments.map((s) => ({ ...s, offset: s.shared ? -4 : 0 }));
+  const studentLayer = studentSegments.map((s) => ({ ...s, offset: s.shared ? 4 : 0 }));
+  const offsetSegment = (s: (typeof expectedSegments)[number] & { offset: number }) => {
+    if (!s.offset) return s;
+    const dx = s.x2 - s.x1;
+    const dy = s.y2 - s.y1;
+    const len = Math.hypot(dx, dy) || 1;
+    const ox = (-dy / len) * s.offset;
+    const oy = (dx / len) * s.offset;
+    return { ...s, x1: s.x1 + ox, y1: s.y1 + oy, x2: s.x2 + ox, y2: s.y2 + oy };
+  };
   const LAYER = ["#ece9fc", "#d6cef8", "#bcb0f2", "#9d8eec", "#7c70f5"];
   const layerFill = (l: number | null) =>
     l == null ? "#e8e8ee" : LAYER[Math.min(l, LAYER.length - 1)];
@@ -1384,17 +1420,11 @@ const VisualGraphTracePanel = ({
             </marker>
           </defs>
 
-          {/* layer guide bands */}
-          {/* edges */}
+          {/* base graph */}
           {active.edges.map((e, i) => {
             const a = pos[e.from];
             const b = pos[e.to];
             if (!a || !b) return null;
-            const key = `${e.from}->${e.to}`;
-            const isExp = expected.has(key);
-            const isStu = student.has(key);
-            const stroke = isExp ? "#28a06d" : isStu ? "#e08a2b" : "var(--line-2)";
-            const sw = isExp || isStu ? 3 : 1.4;
             return (
               <line
                 key={`e${i}`}
@@ -1402,11 +1432,47 @@ const VisualGraphTracePanel = ({
                 y1={a.y}
                 x2={b.x}
                 y2={b.y}
-                stroke={stroke}
-                strokeWidth={sw}
-                strokeDasharray={isStu && !isExp ? "6 4" : undefined}
-                markerEnd={!isExp && !isStu ? "url(#arrow-base)" : undefined}
-                opacity={isExp || isStu ? 0.95 : 0.5}
+                stroke="var(--line-2)"
+                strokeWidth={1.4}
+                markerEnd="url(#arrow-base)"
+                opacity={0.38}
+              />
+            );
+          })}
+
+          {/* expected shortest path */}
+          {expectedLayer.map((raw) => {
+            const s = offsetSegment(raw);
+            return (
+              <line
+                key={`expected-${s.key}`}
+                x1={s.x1}
+                y1={s.y1}
+                x2={s.x2}
+                y2={s.y2}
+                stroke="#28a06d"
+                strokeWidth={3.2}
+                strokeLinecap="round"
+                opacity={0.96}
+              />
+            );
+          })}
+
+          {/* student's returned path */}
+          {studentLayer.map((raw) => {
+            const s = offsetSegment(raw);
+            return (
+              <line
+                key={`student-${s.key}`}
+                x1={s.x1}
+                y1={s.y1}
+                x2={s.x2}
+                y2={s.y2}
+                stroke="#e08a2b"
+                strokeWidth={3.2}
+                strokeLinecap="round"
+                strokeDasharray="7 5"
+                opacity={0.96}
               />
             );
           })}
@@ -1476,11 +1542,25 @@ const GradeApprovalPanel = ({
   total?: number;
   maxTotal?: number;
   showFailedTestsDefault?: boolean;
+  workspaceId?: string;
+  submissionId?: string;
+  diagnosis?: {
+    label?: string;
+    title?: string;
+    severity?: string;
+    explanation?: string;
+    evidence?: string[];
+    detected?: boolean;
+  };
 }>) => {
   const criteria = props.criteria ?? [];
+  const generatedDiagnosis = props.diagnosis;
   const [scores, setScores] = useState<Record<string, number>>(() =>
     Object.fromEntries(criteria.map((c) => [c.id, c.proposed])),
   );
+  const [diagnosisTitle, setDiagnosisTitle] = useState(generatedDiagnosis?.title ?? "");
+  const [diagnosisExplanation, setDiagnosisExplanation] = useState(generatedDiagnosis?.explanation ?? "");
+  const [diagnosisEvidence, setDiagnosisEvidence] = useState((generatedDiagnosis?.evidence ?? []).join("\n"));
   const [showFailed, setShowFailed] = useState<boolean>(!!props.showFailedTestsDefault);
   const [includeResource, setIncludeResource] = useState<boolean>(false);
   const maxTotal = props.maxTotal ?? criteria.reduce((s, c) => s + c.max, 0);
@@ -1534,6 +1614,37 @@ const GradeApprovalPanel = ({
         </span>
       </div>
 
+      <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface-soft)] p-3 flex flex-col gap-2">
+        <div>
+          <div className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+            TA diagnosis
+          </div>
+          {generatedDiagnosis?.title && (
+            <p className="mt-1 text-[11.5px] text-[var(--ink-2)]">
+              Generated evidence: {generatedDiagnosis.title}
+            </p>
+          )}
+        </div>
+        <input
+          value={diagnosisTitle}
+          onChange={(e) => setDiagnosisTitle(e.target.value)}
+          placeholder="Diagnosis title"
+          className="rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1.5 text-[13px] text-[var(--ink)] outline-none focus:border-[var(--lilac)]"
+        />
+        <textarea
+          value={diagnosisExplanation}
+          onChange={(e) => setDiagnosisExplanation(e.target.value)}
+          placeholder="Explain what the student should learn from this review."
+          className="min-h-20 resize-y rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2 text-[12.5px] leading-relaxed text-[var(--ink)] outline-none focus:border-[var(--lilac)]"
+        />
+        <textarea
+          value={diagnosisEvidence}
+          onChange={(e) => setDiagnosisEvidence(e.target.value)}
+          placeholder="Optional evidence or TA note, one item per line."
+          className="min-h-16 resize-y rounded-md border border-[var(--line)] bg-[var(--surface)] px-2.5 py-2 text-[12px] leading-relaxed text-[var(--ink)] outline-none focus:border-[var(--lilac)] mono"
+        />
+      </div>
+
       <div className="flex flex-col gap-2">
         <label className="flex items-center gap-2 text-[13px] text-[var(--ink-2)] cursor-pointer">
           <input type="checkbox" checked={showFailed} onChange={(e) => setShowFailed(e.target.checked)} />
@@ -1552,7 +1663,23 @@ const GradeApprovalPanel = ({
           dispatch?.({
             event: {
               name: "approve_grades",
-              context: { scores, showFailedTests: showFailed, includeResource },
+              context: {
+                workspaceId: props.workspaceId,
+                submissionId: props.submissionId,
+                scores,
+                showFailedTests: showFailed,
+                includeResource,
+                diagnosis: {
+                  label: generatedDiagnosis?.label,
+                  severity: generatedDiagnosis?.severity,
+                  title: diagnosisTitle,
+                  explanation: diagnosisExplanation,
+                  evidence: diagnosisEvidence
+                    .split("\n")
+                    .map((line) => line.trim())
+                    .filter(Boolean),
+                },
+              },
             },
           } as never)
         }
@@ -1560,6 +1687,61 @@ const GradeApprovalPanel = ({
       >
         Approve grades &amp; generate feedback
       </button>
+    </div>
+  );
+};
+
+const CopyFeedbackPanel = ({
+  props,
+}: RendererProps<{
+  text: string;
+  filename?: string;
+}>) => {
+  const [copied, setCopied] = useState(false);
+  const text = props.text ?? "";
+  const safeFilename = (props.filename || "feedback.txt").replace(/[^a-z0-9_.-]+/gi, "_");
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  };
+
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = safeFilename.endsWith(".txt") ? safeFilename : `${safeFilename}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="rounded-[var(--radius)] border border-[var(--line)] bg-[var(--surface)] p-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="min-w-0">
+        <div className="mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--ink-2)]">
+          Feedback handoff
+        </div>
+        <div className="text-[12.5px] text-[var(--ink-2)]">
+          Copy or download the student-facing feedback as plain text.
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void copy()}
+          className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] px-3 py-1.5 text-[12.5px] font-medium text-[var(--ink)] hover:border-[var(--lilac)]"
+        >
+          {copied ? "Copied" : "Copy feedback"}
+        </button>
+        <button
+          type="button"
+          onClick={download}
+          className="rounded-lg bg-[var(--ink)] px-3 py-1.5 text-[12.5px] font-medium text-white hover:bg-[#1d1d23]"
+        >
+          Download .txt
+        </button>
+      </div>
     </div>
   );
 };
@@ -1642,5 +1824,6 @@ export const renderers = {
   MisconceptionPanel,
   VisualGraphTracePanel,
   GradeApprovalPanel,
+  CopyFeedbackPanel,
   CaseComparisonPanel,
 };
