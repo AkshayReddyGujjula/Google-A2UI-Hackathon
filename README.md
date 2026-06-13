@@ -108,31 +108,3 @@ cd agent
 python -m py_compile main.py src/review_agent.py src/peerreview/*.py
 ```
 
-## Demo Script For Judges
-
-1. Open the app and create a short graph or algorithm assignment.
-2. Add or edit rubric criteria manually.
-3. Finalize the assignment.
-4. Upload one correct and one flawed submission.
-5. Open the flawed submission. Point out the scoped review thread, test evidence, diagnosis, and graph overlay.
-6. Edit the diagnosis in the approval panel.
-7. Approve grades and show that final feedback uses the TA-edited diagnosis.
-8. Use `Next Submission` to continue the queue.
-9. Show copy/download feedback and the delete confirmations.
-
-## Current Limitations
-
-- The local JSON store is designed for a hackathon demo, not multi-user production.
-- Python submission execution is a demo runner, not a hardened sandbox.
-- Gemini and LinkUp availability depend on configured API credentials.
-- PDF export is available in the UI, but this README treats copy/download text as the primary verified feedback handoff.
-
-## Judging Checklist
-
-- Generative UI is rendered from a controlled A2UI catalog.
-- The agent produces useful UI, not just text.
-- Test execution remains deterministic and auditable.
-- The TA has final authority over marks and diagnosis.
-- The app supports realistic marking workflow: assignments, submissions, deletion, queueing, approval, and final feedback.
-- The graph trace visualisation makes algorithm mistakes visible, including overlapping expected and student paths.
-- The system is demo-ready with `pnpm smoke` aligned to the current `/review` app.
